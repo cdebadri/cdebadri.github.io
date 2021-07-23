@@ -1,6 +1,13 @@
 export default class Model {
 	constructor(props) {
-	  this._score = 0;
+	  this._shipShields = 100;
+	  this._enemyShipShields = {
+	  	'fighter-1': 100,
+	  	'fighter-2': 100,
+	  	'fighter-3': 100,
+	  	'fighter-4': 100,
+	  };
+	  this._enemyStationShields = 100;
 	  this._soundOn = true;
 	  this._gameOver = false;
 	}
@@ -22,12 +29,30 @@ export default class Model {
 		return this._soundOn;
 	}
 
-	set score(val) {
-		this._score = val;
-		emitter.emit('SCORE_UPDATED');
+	set shipShields(val) {
+		this._shipShields = val;
+		emitter.emit('SHIP_SHIELDS_CHANGE');
 	}
 
-	get score() {
-		return this._score;
+	get shipShields() {
+		return this._shipShields;
+	}
+
+	set enemyShipShields(obj) {
+		this._enemyShipShields[obj.key] = obj.shield;
+		// emitter.emit('SHIP_SHIELDS_CHANGE');
+	}
+
+	getEnemyShipShields(name) {
+		return this._enemyShipShields[name];
+	}
+
+	set enemyStationShields(val) {
+		this._enemyStationShields = val;
+		// emitter.emit('SHIP_SHIELDS_CHANGE');
+	}
+
+	get enemyStationShields() {
+		return this._enemyStationShields;
 	}
 }

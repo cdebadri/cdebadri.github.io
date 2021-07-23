@@ -39,6 +39,7 @@ export default class LoadScene extends Phaser.Scene {
 		});	
 		this.load.image('buttonBackground', '/static/button.png');
 		this.load.image('enemyStation', '/static/enemystation2.png');
+		this.load.image('missile', '/static/missile.png');
 		// this.load.json('shapes', '/static/shapes.json');
 	}
 

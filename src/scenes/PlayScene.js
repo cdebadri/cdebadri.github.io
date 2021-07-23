@@ -1,8 +1,7 @@
 import * as Phaser from 'phaser';
 import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick.js';
-import { Grid, Align } from '../utils';
-import { FindClosest } from '../components';
-import { CONFIG_SIZE } from '../config';
+import { Grid, Align, Model } from '../utils';
+import { FindClosest, Missile } from '../components';
 
 export default class PlayScene extends Phaser.Scene {
 	constructor() {
@@ -18,6 +17,8 @@ export default class PlayScene extends Phaser.Scene {
 			cols: 15,
 			color: 'white',
 		});
+
+		this.model = new Model();
 
 		// const shapes = this.cache.json.get('shapes');
 
@@ -143,12 +144,14 @@ export default class PlayScene extends Phaser.Scene {
 		const explosion = this.add.sprite(bullet.x, bullet.y, 'exp');
 		bullet.destroy();
 		explosion.play('boom');
+		this.model.enemyStationShields -= 5;
 	}
 
 	enemyDestroysShip(ship, bullet) {
 		bullet.destroy();
 		const explosion = this.add.sprite(ship.x, ship.y, 'exp');
 		explosion.play('boom');
+		this.model.shipShields -= 5;
 	}
 
 	createRocks() {
@@ -174,6 +177,7 @@ export default class PlayScene extends Phaser.Scene {
 		rock.destroy();
 		const explosion = this.add.sprite(ship.x, ship.y, 'exp');
     explosion.play('boom');
+    this.model.shipShields -= 1;
 	}
 
 	destroyRocks(bullet, rock) {
@@ -212,13 +216,13 @@ export default class PlayScene extends Phaser.Scene {
 
 	setEnemyConfigurations(eship) {
 		eship.topSpeed = 50;
-		eship.range = game.config.height / 3;
-		eship.flyRange = game.config.height / 3;
+		eship.range = game.config.height / CONFIG_SIZE.ENEMY_DETECTION_DENOM;
+		eship.flyRange = game.config.height / CONFIG_SIZE.ENEMY_DETECTION_DENOM;
 		eship.setPushable(false);
 	}
 
 	setEnemyStationConfigurations() {
-		this.enemyStation.range = game.config.height / 2;
+		this.enemyStation.range = game.config.height / CONFIG_SIZE.ENEMY_DETECTION_DENOM;
 		this.enemyStation.assistGroup = 1;
 		this.enemyStation.assistPositions = [];
 		this.enemyStation.setPushable(false);
@@ -279,6 +283,10 @@ export default class PlayScene extends Phaser.Scene {
 		const explosion = this.add.sprite(bullet.x, bullet.y, 'exp');
 		bullet.destroy();
 		explosion.play('boom');
+		this.model.enemyShipShields = {
+			key: ship.name,
+			shield: this.model.getEnemyShipShields(ship.name),
+		}
 	}
 
 	getTimer() {
@@ -379,6 +387,76 @@ export default class PlayScene extends Phaser.Scene {
 		}
 	}
 
+	fireMissile() {
+		if (
+			Align.detectProximity(
+				this.enemyStation,
+				this.ship,
+				this.enemyStation.range
+			) &&
+			!this.missile
+		) {
+			this.missile = new Missile({
+				scene: this,
+				x: this.enemyStation.x,
+				y: this.enemyStation.y,
+				shipX: this.ship.x,
+				shipY: this.ship.y,
+				angle: Align.toDegrees(
+					Phaser.Math.Angle.Between(
+						this.enemyStation.x,
+						this.enemyStation.y,
+						this.ship.x,
+						this.ship.y
+					)
+				),
+				key: 'missile',
+			});
+			this.missileRecalibrationTime = new Date().getTime();
+			this.physics.add.collider(this.missile, this.ship, this.missileDestroysShip, null, this);
+			this.physics.add.collider(this.missile, this.rockGroup, this.rocksDestroyMissile, null, this);
+		}
+	}
+
+	rocksDestroyMissile(missile, rock) {
+		missile.destroy();
+		this.missile = null;
+		const explosion = this.add.sprite(rock.x, rock.y, 'exp');
+		rock.destroy();
+    explosion.play('boom');
+	}
+
+	missileDestroysShip(missile, ship) {
+		missile.destroy();
+		this.missile = null;
+		const explosion = this.add.sprite(ship.x, ship.y, 'exp');
+    explosion.play('boom');
+    this.model.shipShields = 0;
+	}
+
+	recalibrateMissile() {
+		if (
+			this.missile && this.missileRecalibrationTime
+			&& (this.getTimer() - this.missileRecalibrationTime) > 5000 
+		) {
+			this.missile.emit(
+				'RECALIBRATE',
+				Align.toDegrees(
+					Phaser.Math.Angle.Between(
+						this.missile.x,
+						this.missile.y,
+						this.ship.x,
+						this.ship.y
+					)
+				),
+				this.ship.x,
+				this.ship.y 
+			);
+
+			this.missileRecalibrationTime = this.getTimer();
+		}
+	}
+
 	update() {
 		if (!isMobile) {
 			this.fallbackToKeyboard();
@@ -400,5 +478,8 @@ export default class PlayScene extends Phaser.Scene {
 				this.makeEnemyBullets(closestEnemyFighter);
 			}
 		}
+
+		this.fireMissile();
+		this.recalibrateMissile();
 	}
 }
