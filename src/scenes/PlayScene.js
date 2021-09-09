@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick.js';
-import { Grid, Align, Model } from '../utils';
+import { Grid, Align, Model, Bar } from '../utils';
 import { FindClosest, Missile } from '../components';
 
 export default class PlayScene extends Phaser.Scene {
@@ -39,6 +39,7 @@ export default class PlayScene extends Phaser.Scene {
 		this.setShipConfigurations();
 		this.ship.body.collideWorldBounds = true;
 		this.grid.placeAt(565, this.ship);
+		this.showShipHealth();
 
 		// this.isEnemyAvailable = false;
 
@@ -87,6 +88,15 @@ export default class PlayScene extends Phaser.Scene {
 
 		// this.grid.showNumbers();
 	}
+
+	// TODO
+	// showShipHealth() {
+	// 	const bar = new Bar({
+	// 		scene: this,
+	// 		color: 0x00ff00,
+	// 		width: 
+	// 	})
+	// }
 
 	createFireButton() {
 		// fire button needs to be changed
