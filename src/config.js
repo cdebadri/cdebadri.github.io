@@ -1,4 +1,4 @@
-export const CONFIG_SIZE_LARGE_SCREEN = {
+export const CONFIG_SIZE_LARGE_SCREEN = config => ({
 	SHIP: 0.1,
 	ENEMY_STATION: 0.7,
 	ROCKS: 0.05,
@@ -7,12 +7,17 @@ export const CONFIG_SIZE_LARGE_SCREEN = {
 	ENEMY_STATION_BODY: 0.33,
 	ENEMY_DETECTION_DENOM: 2,
 	HEALTH: {
-		WIDTH: 0.5 * game.config.width,
-		HEIGHT: 0.1 * game.config.height, 
+		WIDTH: 0.5 * config.width,
+		HEIGHT: 0.1 * config.height, 
 	},
-}
+  SHIP_DAMAGE: {
+    START: 0.2,
+    END: 0.5,
+  },
+  SHIP_HEALTH_POSITION: 168,
+})
 
-export const CONFIG_SIZE_SMALL_SCREEN = {
+export const CONFIG_SIZE_SMALL_SCREEN = config => ({
 	SHIP: 0.15,
 	ENEMY_STATION: 1,
 	FIRE_BUTTON: 0.1,
@@ -25,8 +30,13 @@ export const CONFIG_SIZE_SMALL_SCREEN = {
 	ENEMY_STATION_BODY: 0.5,
 	ENEMY_DETECTION_DENOM: 1.5,
 	HEALTH: {
-		WIDTH: 0.3 * game.config.width,
-		HEIGHT: 0.1 * game.config.height,
+		WIDTH: 0.5 * config.width,
+		HEIGHT: 0.05 * config.height,
 	},
-}
+  SHIP_DAMAGE: {
+    START: 0.2,
+    END: 0.5,
+  },
+  SHIP_HEALTH_POSITION: 153,
+});
 

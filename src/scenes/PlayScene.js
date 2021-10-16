@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick.js';
 import { Grid, Align, Model, Bar } from '../utils';
 import { FindClosest, Missile } from '../components';
+import CleanupGroup from '../components/CleanupGroup';
 
 export default class PlayScene extends Phaser.Scene {
 	constructor() {
@@ -19,6 +20,7 @@ export default class PlayScene extends Phaser.Scene {
 		});
 
 		this.model = new Model();
+    // this.effects = new AnimationEffects();
 
 		// const shapes = this.cache.json.get('shapes');
 
@@ -84,19 +86,77 @@ export default class PlayScene extends Phaser.Scene {
 
 		this.setColliders();
 
-		// emitter.on('SPAWN_ENEMY', this.createEnemy, this);
-
+		emitter.on('SHIP_SHIELDS_CHANGE', this.changePlayerShieldValue, this);
+    emitter.on('ENEMY_SHIPS_SHIELDS_CHANGE', this.checkEnemyShields, this);
 		// this.grid.showNumbers();
 	}
 
+  checkEnemyShields(key) {
+    // debugger;
+    const enemyFighter = this.enemyFightersGroup.getChildren().find(child => child.name === key);
+    const enemyFighterShield = this.model.getEnemyShipShields(key); 
+    if (enemyFighterShield < 50 && !enemyFighter.fireEmitter) {
+      this.createFire(enemyFighter);
+    } else if (enemyFighterShield === 0) {
+      const explosion = this.add.sprite(this.ship.x, this.ship.y, 'exp');
+      explosion.play('boom');
+      
+      if ('fireEmitter' in enemyFighter) {
+        enemyFighter.fireEmitter.remove();
+      }
+      enemyFighter.destroy();
+    }
+  }
+
 	// TODO
-	// showShipHealth() {
-	// 	const bar = new Bar({
-	// 		scene: this,
-	// 		color: 0x00ff00,
-	// 		width: 
-	// 	})
-	// }
+	showShipHealth() {
+		this.playerHealth = new Bar({
+			scene: this,
+			color: 0xDC143C,
+			width: CONFIG_SIZE.HEALTH.WIDTH,
+      height: CONFIG_SIZE.HEALTH.HEIGHT,
+		});
+
+    this.grid.placeAt(CONFIG_SIZE.SHIP_HEALTH_POSITION, this.playerHealth);
+    this.playerHealth.setScrollFactor(0);
+    this.playerHealth.setDepth(1);
+    this.hasLowHealth = false;
+	}
+
+  changePlayerShieldValue() {
+    this.playerHealth.setPercent(this.model.shipShields / 100);
+    if (this.model.shipShields < 50 && !this.hasLowHealth) {
+      this.createFire(this.ship);
+      this.hasLowHealth = true;
+    }
+
+    if (this.model.shipShields === 0) {
+      const explosion = this.add.sprite(this.ship.x, this.ship.y, 'exp');
+      explosion.play('boom');
+      if ('fireEmitter' in this.ship) {
+        this.ship.fireEmitter.remove();
+      }
+      this.ship.destroy();
+      this.model.gameOver = true;
+    }
+  }
+
+  createFire(object) {
+    const particles = this.add.particles('fire');
+
+    object.fireEmitter = particles.createEmitter({
+      alpha: { start: 1, end: 0 },
+      scale: { start: CONFIG_SIZE.SHIP_DAMAGE.START, end: CONFIG_SIZE.SHIP_DAMAGE.END },
+      speed: 20,
+      angle: { min: object.angle-10, max: object.angle+10 },
+      rotate: { min: -180, max: 180 },
+      lifespan: { min: 1000, max: 1100 },
+      blendMode: 'ADD',
+      frequency: 110,
+    });
+
+    object.fireEmitter.startFollow(object);
+  }
 
 	createFireButton() {
 		// fire button needs to be changed
@@ -213,6 +273,13 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
 	makeBullets() {
+    const elapsed = Math.abs(this.lastBullet - this.getTimer());
+		
+		if (elapsed < 500) {
+			return;
+		}
+
+		this.lastBullet = this.getTimer();
 		const bullet = this.physics.add.sprite(0, 0, 'bullet');
 		this.bulletGroup.add(bullet);
 		bullet.x = this.ship.x;
@@ -293,10 +360,12 @@ export default class PlayScene extends Phaser.Scene {
 		const explosion = this.add.sprite(bullet.x, bullet.y, 'exp');
 		bullet.destroy();
 		explosion.play('boom');
+    // debugger;
 		this.model.enemyShipShields = {
 			key: ship.name,
-			shield: this.model.getEnemyShipShields(ship.name),
+			shield: this.model.getEnemyShipShields(ship.name) - 5,
 		}
+    // debugger;
 	}
 
 	getTimer() {
@@ -333,7 +402,7 @@ export default class PlayScene extends Phaser.Scene {
 		this.enemyFightersGroup.emit('retracePosition');
 
 		if (
-			Align.detectProximity(fighter, this.ship, fighter.flyRange)
+			Align.detectProximity(fighter, this.ship, fighter.flyRange) && !this.model.gameOver
 		) {
 			this.physics.moveTo(fighter, this.ship.x, this.ship.y, fighter.topSpeed);
 		} else {
@@ -367,6 +436,8 @@ export default class PlayScene extends Phaser.Scene {
 			this.makeBullets();
 		}
 
+    // keyS.on('down', this.makeBullets, this);
+
 		if (cursors.left.isDown && cursors.up.isDown) {
 			this.ship.angle = 225;
 		} else if (cursors.right.isDown && cursors.up.isDown) {
@@ -387,14 +458,16 @@ export default class PlayScene extends Phaser.Scene {
 			stop = true;
 		}
 
-		if (stop) {
-			this.ship.body.setVelocity(0, 0);
-		} else {
-			this.ship.body.setVelocity(
-				Math.cos(Align.toRadians(this.ship.angle)) * this.ship.topSpeed,
-				Math.sin(Align.toRadians(this.ship.angle)) * this.ship.topSpeed
-			);
-		}
+    if (this.ship.body) {
+      if (stop) {
+        this.ship.body.setVelocity(0, 0);
+      } else {
+        this.ship.body.setVelocity(
+          Math.cos(Align.toRadians(this.ship.angle)) * this.ship.topSpeed,
+          Math.sin(Align.toRadians(this.ship.angle)) * this.ship.topSpeed
+        );
+      }
+    }
 	}
 
 	fireMissile() {
@@ -404,7 +477,7 @@ export default class PlayScene extends Phaser.Scene {
 				this.ship,
 				this.enemyStation.range
 			) &&
-			!this.missile
+			!this.missile && !this.model.gameOver
 		) {
 			this.missile = new Missile({
 				scene: this,
@@ -467,6 +540,19 @@ export default class PlayScene extends Phaser.Scene {
 		}
 	}
 
+  destroyChildren(group) {
+    const elapsed = Math.abs(this.destructionGroupTimer = this.getTimer());
+
+    if (elapsed < 500) {
+      return;
+    }
+
+    this.destructionGroupTimer = this.getTimer();
+    if (group.maxSize > 0) {
+      CleanupGroup(group, this);
+    }
+  }
+
 	update() {
 		if (!isMobile) {
 			this.fallbackToKeyboard();
@@ -483,7 +569,7 @@ export default class PlayScene extends Phaser.Scene {
 					this.ship, 
 					closestEnemyFighter, 
 					closestEnemyFighter.range 
-				)
+				) && !this.model.gameOver
 			) {
 				this.makeEnemyBullets(closestEnemyFighter);
 			}
@@ -491,5 +577,7 @@ export default class PlayScene extends Phaser.Scene {
 
 		this.fireMissile();
 		this.recalibrateMissile();
+    this.destroyChildren(this.bulletGroup);
+    this.destroyChildren(this.enemyBulletGroup);
 	}
 }

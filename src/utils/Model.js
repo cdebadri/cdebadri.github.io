@@ -1,3 +1,5 @@
+import { clamp } from '../utils/Align';
+
 export default class Model {
 	constructor(props) {
 	  this._shipShields = 100;
@@ -30,7 +32,7 @@ export default class Model {
 	}
 
 	set shipShields(val) {
-		this._shipShields = val;
+		this._shipShields = clamp(0, val, 100);
 		emitter.emit('SHIP_SHIELDS_CHANGE');
 	}
 
@@ -39,8 +41,8 @@ export default class Model {
 	}
 
 	set enemyShipShields(obj) {
-		this._enemyShipShields[obj.key] = obj.shield;
-		// emitter.emit('SHIP_SHIELDS_CHANGE');
+		this._enemyShipShields[obj.key] = clamp(0, obj.shield, 100);
+		emitter.emit('ENEMY_SHIPS_SHIELDS_CHANGE', obj.key);
 	}
 
 	getEnemyShipShields(name) {
@@ -48,8 +50,8 @@ export default class Model {
 	}
 
 	set enemyStationShields(val) {
-		this._enemyStationShields = val;
-		// emitter.emit('SHIP_SHIELDS_CHANGE');
+		this._enemyStationShields = clamp(0, val, 100);
+		emitter.emit('ENEMY_STATION_SHIELDS_CHANGE');
 	}
 
 	get enemyStationShields() {

@@ -31,6 +31,7 @@ export default class LoadScene extends Phaser.Scene {
 			startFrame: 0,
 			endFrame: 15,
 		});
+    this.load.image('fire', '/static/muzzleflash3.png');
 		this.load.spritesheet('rocks', '/static/rocks.png', {
 			frameWidth: 125,
 			frameHeight: 100,

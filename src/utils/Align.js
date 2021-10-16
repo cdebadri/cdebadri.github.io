@@ -37,5 +37,7 @@ module.exports = {
 		const distX = Math.abs(obj1.x - obj2.x);
     const distY = Math.abs(obj1.y - obj2.y);
     return (distX < range && distY < range);
-	}
+	},
+
+  clamp: (min, num, max) => Math.min(Math.max(num, min), max),
 }
