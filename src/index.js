@@ -10,10 +10,10 @@ if (isMobile === -1) {
 }
 
 const config = isMobile === -1 ? {
-	type: Phaser.CANVAS,
+	type: Phaser.AUTO,
   parent: 'app',
-  width: 800,
-  height: 480,
+  width: window.innerWidth * 0.6,
+  height: window.innerHeight * 0.7,
   scene: [LoadScene, PlayScene],
   physics: {
     default: 'arcade',

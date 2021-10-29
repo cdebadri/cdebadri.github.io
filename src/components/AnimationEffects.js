@@ -2,21 +2,26 @@ import * as Phaser from 'phaser';
 // import { Align } from '../utils';
 
 export default class AnimationEffects {
-	constructor() {
-    this.animationManager = new Phaser.Animations.AnimationManager(game);
-    this.textureManager = new Phaser.Textures.Texture(game);
-    this.lowHealth();
+	constructor(config) {
+    this.scene = config.scene;
+    this.tweenManager = new Phaser.Tweens.TweenManager(config.scene);
 	}
 
-  lowHealth() {
-    this.textureManager.createCanvas('fire', 60, 70)
-    let fireFrames = this.animationManager.generateFrameNumbers('fire');
-    fireFrames = fireFrames.slice().reverse().concat(fireFrames);
-    this.animationManager.create({
-      key: 'lowHealth',
-      frames: fireFrames,
-      frameRate: 48,
-      repeat: true,
+  destroyEnemyStation() {
+    emitter.emit('ENEMY_STATION_DESTROYED');
+  }
+
+  enemyStationDestruction({ targets }) {
+    this.tweenManager.add({
+      duration: 300,
+      targets,
+      scaleX: 10,
+      scaleY: 10,
+      ease: 'Sine.easeInOut',
+      // onComplete: this.destroyEnemyStation,
+      yoyo: true,
+      repeat: -1,
+      callbackScope: this.tweenManager.scene,
     });
   }
 }

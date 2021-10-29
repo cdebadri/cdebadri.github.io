@@ -20,7 +20,7 @@ export default class PlayScene extends Phaser.Scene {
 		});
 
 		this.model = new Model();
-    // this.effects = new AnimationEffects();
+    // this.effects = new AnimationEffects({ scene: this });
 
 		// const shapes = this.cache.json.get('shapes');
 
@@ -88,8 +88,66 @@ export default class PlayScene extends Phaser.Scene {
 
 		emitter.on('SHIP_SHIELDS_CHANGE', this.changePlayerShieldValue, this);
     emitter.on('ENEMY_SHIPS_SHIELDS_CHANGE', this.checkEnemyShields, this);
+    emitter.on('ENEMY_STATION_SHIELDS_CHANGE', this.checkEnemyStationShields, this);
+    emitter.on('ENEMY_STATION_DESTROYED', this.destroyEnemyStation, this);
 		// this.grid.showNumbers();
 	}
+
+  destroyEnemyStation() {
+    this.stationExplosionFire.destroy();
+  }
+
+  // takingFire(object) {
+  //   object.shotTween = this.tweens.create({
+  //     targets: object,
+  //     // angle: {from: object.angle, to:object.angle + 5},
+  //     ease: 'Bounce.easeInOut',
+  //     duration: 500,
+  //     yoyo: true,
+  //   })
+  // }
+
+  checkEnemyStationShields() {
+    if (this.model.enemyStationShields < 50 && !this.enemyStation.fireEmitter) {
+      this.createFire(this.enemyStation);
+    } else if (this.model.enemyStationShields === 0) {
+      // a massive explosion
+      if ('fireEmitter' in this.enemyStation) {
+        this.enemyStation.fireEmitter.remove();
+      }
+      this.stationExplosionFire = this.add.sprite(this.enemyStation.x, this.enemyStation.y, 'fire');
+      // this.effects.enemyStationDestruction({ targets: this.stationExplosionFire });
+      // this.enemyStation.destroy();
+      const vanish = this.tweens.create({
+        targets: this.stationExplosionFire,
+        alpha: 0,
+        ease: 'Sine.easeInOut',
+        onCompleteScope: function() {
+          emitter.emit('ENEMY_STATION_DESTROYED');
+        },
+        onCompleteScope: this,
+        onStart: function() {
+          this.enemyStation.destroy();
+        },
+        onStartScope: this,
+        callbackScope: this,
+      });
+      
+      this.tweens.add({
+        duration: 1000,
+        targets: this.stationExplosionFire,
+        scaleX: CONFIG_SIZE.ENEMY_STATION_EXPLOSION_FIRE,
+        scaleY: CONFIG_SIZE.ENEMY_STATION_EXPLOSION_FIRE,
+        ease: 'Quad.easeOut',
+        onComplete: function() {
+          this.tweens.makeActive(vanish);
+        },
+        onCompleteScope: this,
+        callbackScope: this,
+      });
+
+    }
+  }
 
   checkEnemyShields(key) {
     // debugger;
@@ -128,6 +186,15 @@ export default class PlayScene extends Phaser.Scene {
     if (this.model.shipShields < 50 && !this.hasLowHealth) {
       this.createFire(this.ship);
       this.hasLowHealth = true;
+      const redAlert = this.add.graphics();
+      redAlert.fillStyle(0xff0000, 0.3);
+      redAlert.fillRect(0, 0, this.background.displayWidth, this.background.displayHeight);
+      this.tweens.add({
+        repeat: -1,
+        yoyo: true,
+        targets: redAlert,
+        alpha: 0,
+      });
     }
 
     if (this.model.shipShields === 0) {
@@ -143,10 +210,11 @@ export default class PlayScene extends Phaser.Scene {
 
   createFire(object) {
     const particles = this.add.particles('fire');
+    const { start, end } = object.name === 'ENEMY_STATION' ? CONFIG_SIZE.STATION_DAMAGE : CONFIG_SIZE.SHIP_DAMAGE; 
 
     object.fireEmitter = particles.createEmitter({
       alpha: { start: 1, end: 0 },
-      scale: { start: CONFIG_SIZE.SHIP_DAMAGE.START, end: CONFIG_SIZE.SHIP_DAMAGE.END },
+      scale: { start, end },
       speed: 20,
       angle: { min: object.angle-10, max: object.angle+10 },
       rotate: { min: -180, max: 180 },
@@ -214,13 +282,24 @@ export default class PlayScene extends Phaser.Scene {
 		const explosion = this.add.sprite(bullet.x, bullet.y, 'exp');
 		bullet.destroy();
 		explosion.play('boom');
-		this.model.enemyStationShields -= 5;
+    if (
+      Align.detectProximity(
+        station,
+        bullet,
+        game.config.height / CONFIG_SIZE.ENEMY_DETECTION_DENOM
+      )
+    ) {
+      this.model.enemyStationShields -= 10;
+    } else {
+      this.model.enemyStationShields -= 5;
+    }
 	}
 
 	enemyDestroysShip(ship, bullet) {
 		bullet.destroy();
 		const explosion = this.add.sprite(ship.x, ship.y, 'exp');
 		explosion.play('boom');
+		this.cameras.main.shake(200);
 		this.model.shipShields -= 5;
 	}
 
@@ -270,6 +349,7 @@ export default class PlayScene extends Phaser.Scene {
 	setShipConfigurations() {
 		this.ship.angle = -90;
 		this.ship.topSpeed = 120;
+    // this.takingFire(this.ship);
 	}
 
 	makeBullets() {
@@ -282,6 +362,8 @@ export default class PlayScene extends Phaser.Scene {
 		this.lastBullet = this.getTimer();
 		const bullet = this.physics.add.sprite(0, 0, 'bullet');
 		this.bulletGroup.add(bullet);
+    bullet.originX = this.ship.x;
+    bullet.originY = this.ship.y;
 		bullet.x = this.ship.x;
 		bullet.y = this.ship.y;
 		bullet.angle = this.ship.angle;
@@ -293,12 +375,13 @@ export default class PlayScene extends Phaser.Scene {
 
 	setEnemyConfigurations(eship) {
 		eship.topSpeed = 50;
-		eship.range = game.config.height / CONFIG_SIZE.ENEMY_DETECTION_DENOM;
-		eship.flyRange = game.config.height / CONFIG_SIZE.ENEMY_DETECTION_DENOM;
+		eship.range = game.config.height / CONFIG_SIZE.ENEMY_SHIP_DETECTION_DENOM;
+		eship.flyRange = game.config.height / CONFIG_SIZE.ENEMY_SHIP_DETECTION_DENOM;
 		eship.setPushable(false);
 	}
 
 	setEnemyStationConfigurations() {
+    this.enemyStation.name = 'ENEMY_STATION';
 		this.enemyStation.range = game.config.height / CONFIG_SIZE.ENEMY_DETECTION_DENOM;
 		this.enemyStation.assistGroup = 1;
 		this.enemyStation.assistPositions = [];

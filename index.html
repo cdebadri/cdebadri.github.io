@@ -14,13 +14,26 @@
       body {
         margin: 0;
         padding: 0;
+        background-color: black;
+      }
+      .game-area {
+        margin: 0 30px;
+      }
+      .container {
+        display: flex;
+        margin-top: 40px;
       }
     </style>
   </head>
 
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="app"></div>
+    <div class="container">
+      <div class="game-area" id="app"></div>
+      <div>
+        <h2 style="color:white;">INSTRUCTIONS</h2>
+      </div>
+    </div>
     <!-- Scripts will be injected automatically -->
   </body>
 </html>

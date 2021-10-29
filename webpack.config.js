@@ -66,7 +66,7 @@ module.exports = {
   devServer: {
     publicPath: '/',
     compress: true,
-    port: 8080,
+    port: 3000,
     // host: '192.168.43.201',
   },
 }
