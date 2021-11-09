@@ -7,6 +7,7 @@ export default class LoadScene extends Phaser.Scene {
 	}
 
 	preload() {
+    updateTemplateDOM('SHOW_GAME_AREA');
 		const grid = new Grid({
 			scene: this,
 			rows: 12,

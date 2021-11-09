@@ -9,6 +9,27 @@ if (isMobile === -1) {
   isMobile = navigator.userAgent.indexOf('Tablet');
 }
 
+window.updateTemplateDOM = function(eventName) {
+  switch(eventName) {
+    case 'SHOW_GAME_AREA_LOADING':
+      const container = document.getElementById('container');
+      const mdLoader = document.createElement('div');
+      mdLoader.id = 'md-loader-container';
+      const loader = document.createElement('div');
+      loader.className = 'loader';
+      mdLoader.appendChild(loader);
+
+      container.prepend(mdLoader);
+      return;
+    case 'SHOW_GAME_AREA':
+      document.getElementById('md-loader-container').remove();
+      document.getElementById('app').classList.remove('display-hidden');
+      return;
+  }
+};
+
+updateTemplateDOM('SHOW_GAME_AREA_LOADING');
+
 const config = isMobile === -1 ? {
 	type: Phaser.AUTO,
   parent: 'app',
