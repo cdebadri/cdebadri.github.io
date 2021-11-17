@@ -1,0 +1,10 @@
+{
+  "instructions": {
+    "title": "INSTRUCTIONS",
+    "body": "Press the arrow keys to move the plane and S to shoot bullets"
+  },
+  "gameStory": {
+    "title": "Space Saga",
+    "body": "An awesome body"
+  }
+}

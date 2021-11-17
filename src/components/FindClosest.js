@@ -5,7 +5,7 @@ export default function(group, object) {
 	let closestChild;
 	let distance;
 
-	group.getChildren().forEach(function(child) {
+	group.children.iterate(function(child) {
 		distance = Phaser.Math.Distance.Between(child.x, child.y, object.x, object.y);
 		if (minDistance > distance) {
 			minDistance = distance;

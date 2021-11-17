@@ -122,12 +122,18 @@ export default class PlayScene extends Phaser.Scene {
         targets: this.stationExplosionFire,
         alpha: 0,
         ease: 'Sine.easeInOut',
-        onCompleteScope: function() {
+        onComplete: function() {
           emitter.emit('ENEMY_STATION_DESTROYED');
         },
         onCompleteScope: this,
         onStart: function() {
           this.enemyStation.destroy();
+          this.enemyFightersGroup.children.each(function(child) {
+            this.model.enemyShipShields = {
+              key: child.name,
+              shield: 0
+            };
+          }, this);
         },
         onStartScope: this,
         callbackScope: this,
@@ -146,23 +152,31 @@ export default class PlayScene extends Phaser.Scene {
         callbackScope: this,
       });
 
+			// explosion of enemy fighters
+      this.model.gameOver = true;
     }
   }
+
+	// destroyAllEnemyFighters() {
+
+	// }
 
   checkEnemyShields(key) {
     // debugger;
     const enemyFighter = this.enemyFightersGroup.getChildren().find(child => child.name === key);
     const enemyFighterShield = this.model.getEnemyShipShields(key); 
-    if (enemyFighterShield < 50 && !enemyFighter.fireEmitter) {
-      this.createFire(enemyFighter);
-    } else if (enemyFighterShield === 0) {
+    
+    if (enemyFighterShield === 0) {
       const explosion = this.add.sprite(this.ship.x, this.ship.y, 'exp');
       explosion.play('boom');
       
       if ('fireEmitter' in enemyFighter) {
         enemyFighter.fireEmitter.remove();
       }
+      emitter.emit(`ENEMY_DESTROYED_${enemyFighter.name}`);
       enemyFighter.destroy();
+    } else if (enemyFighterShield < 50 && !enemyFighter.fireEmitter) {
+      this.createFire(enemyFighter);
     }
   }
 
@@ -457,7 +471,7 @@ export default class PlayScene extends Phaser.Scene {
 
 	maintainPosition() {
 		const pursuingFighterName = this.pursuingFighter.name;
-		this.enemyFightersGroup.getChildren().forEach(function(child) {
+		this.enemyFightersGroup.children.iterate(function(child) {
 			if (child.name !== pursuingFighterName && child.speed !== 0) {
 				this.retracePosition(child);
 			}
@@ -560,7 +574,7 @@ export default class PlayScene extends Phaser.Scene {
 				this.ship,
 				this.enemyStation.range
 			) &&
-			!this.missile && !this.model.gameOver
+			!this.missile && !this.model.gameOver && !this.enemyStation
 		) {
 			this.missile = new Missile({
 				scene: this,
@@ -640,6 +654,10 @@ export default class PlayScene extends Phaser.Scene {
 		if (!isMobile) {
 			this.fallbackToKeyboard();
 		}
+
+    // if (this.model.gameOver) {
+    //   return;
+    // }
 
 		let closestEnemyFighter;
 

@@ -94,3 +94,7 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.text {
+  color: white;
+}

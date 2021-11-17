@@ -38,7 +38,15 @@ module.exports = {
             loader: 'file-loader',
           }
         ],
-      }
+      },
+      {
+        test: /\.handlebars$/i,
+        use: [
+          {
+            loader: 'handlebars-loader',
+          },
+        ],
+      },
     ]
   },
   mode: 'development',
@@ -51,7 +59,8 @@ module.exports = {
     }),
     new htmlWebpackPlugin({
       inject: true,
-      template: path.resolve(__dirname, 'index.html'),
+      template: path.resolve(__dirname, 'index.handlebars'),
+      templateParameters: require('./en'),
     }),
     new copyWebpackPlugin({
       patterns: [
