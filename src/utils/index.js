@@ -7,6 +7,7 @@ import Controller from './Controller';
 import Scorebox from './Scorebox';
 import ToggleButtonWrapper from './ToggleButtonWrapper';
 import Align from './Align';
+import Text from './Text';
 
 export {
 	Grid,
@@ -18,4 +19,5 @@ export {
 	Controller,
 	Scorebox,
 	Align,
+  Text,
 };

@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
-import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick.js';
-import { Grid, Align, Model, Bar } from '../utils';
+import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick';
+import { Grid, Align, Model, Bar, Media } from '../utils';
 import { FindClosest, Missile } from '../components';
 import CleanupGroup from '../components/CleanupGroup';
 
@@ -11,6 +11,15 @@ export default class PlayScene extends Phaser.Scene {
 		});
 	}
 
+  init() {
+		this.model = new Model();
+    this.media = new Media({ scene: this });
+    this.explosion = null;
+    this.enemyBulletGroup = null;
+    this.enemyFightersGroup = null;
+    this.rockGroup = null;
+  }
+
 	create() {
 		this.grid = new Grid({
 			scene: this,
@@ -19,7 +28,6 @@ export default class PlayScene extends Phaser.Scene {
 			color: 'white',
 		});
 
-		this.model = new Model();
     // this.effects = new AnimationEffects({ scene: this });
 
 		// const shapes = this.cache.json.get('shapes');
@@ -81,7 +89,11 @@ export default class PlayScene extends Phaser.Scene {
       repeat: false,
     });
 
+		this.particles = this.add.particles('fire');
+
 		this.cameras.main.setBounds(0, 0, this.background.displayWidth, this.background.displayHeight);
+
+		this.cameras.main.fadeIn(1000, 0, 0, 0);
 		this.cameras.main.startFollow(this.ship, true);
 
 		this.setColliders();
@@ -94,8 +106,28 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
   destroyEnemyStation() {
+    this.events.off('ENEMY_STATION_DESTROYED');
     this.stationExplosionFire.destroy();
+		this.transition();
   }
+
+	destroyObjects() {
+    // if (this.enemyBulletGroup) {
+    //   this.enemyBulletGroup.destroy(this.enemyBulletGroup.getLength() > 0);
+    // }
+    // if (this.enemyFightersGroup) {
+    //   this.enemyFightersGroup.destroy(this.enemyFightersGroup.getLength() > 0);
+    // }
+    // if (this.bulletGroup) {
+  	// 	this.bulletGroup.destroy(this.bulletGroup.getLength() > 0);
+    // }
+    // if (this.rockGroup) {
+  	// 	this.rockGroup.destroy(this.rockGroup.getLength() > 0);
+    // }
+		this.particles.destroy();
+		this.background.destroy();
+    this.explosion.destroy();
+	}
 
   // takingFire(object) {
   //   object.shotTween = this.tweens.create({
@@ -107,12 +139,33 @@ export default class PlayScene extends Phaser.Scene {
   //   })
   // }
 
+  createExplosion(x, y) {
+    if (!this.explosion) {
+      this.explosion = this.add.sprite(0, 0, 'exp');
+    }
+
+    this.explosion.x = x;
+    this.explosion.y = y;
+
+    if (this.explosion.play) {
+      this.explosion.play('boom');
+    }
+  }
+
+	transition() {
+    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function() {
+      this.destroyObjects();
+			this.scene.start('EndScene', { gameOver: this.model.gameOver });
+		}, this);
+		this.cameras.main.fadeOut(2000, 0, 0, 0);
+	}
+
   checkEnemyStationShields() {
-    if (this.model.enemyStationShields < 50 && !this.enemyStation.fireEmitter) {
+    if (this.model.enemyStationShields < 50 && this.model.enemyStationShields > 0 && !this.enemyStation.fireEmitter) {
       this.createFire(this.enemyStation);
     } else if (this.model.enemyStationShields === 0) {
       // a massive explosion
-      if ('fireEmitter' in this.enemyStation) {
+      if (this.enemyStation && 'fireEmitter' in this.enemyStation) {
         this.enemyStation.fireEmitter.remove();
       }
       this.stationExplosionFire = this.add.sprite(this.enemyStation.x, this.enemyStation.y, 'fire');
@@ -127,6 +180,8 @@ export default class PlayScene extends Phaser.Scene {
         },
         onCompleteScope: this,
         onStart: function() {
+          emitter.emit('PLAY_SOUND', 'explosionSound');
+          this.events.off('ENEMY_STATION_SHIELDS_CHANGE');
           this.enemyStation.destroy();
           this.enemyFightersGroup.children.each(function(child) {
             this.model.enemyShipShields = {
@@ -151,9 +206,6 @@ export default class PlayScene extends Phaser.Scene {
         onCompleteScope: this,
         callbackScope: this,
       });
-
-			// explosion of enemy fighters
-      this.model.gameOver = true;
     }
   }
 
@@ -167,14 +219,19 @@ export default class PlayScene extends Phaser.Scene {
     const enemyFighterShield = this.model.getEnemyShipShields(key); 
     
     if (enemyFighterShield === 0) {
-      const explosion = this.add.sprite(this.ship.x, this.ship.y, 'exp');
-      explosion.play('boom');
-      
-      if ('fireEmitter' in enemyFighter) {
-        enemyFighter.fireEmitter.remove();
+      emitter.emit('PLAY_SOUND', 'fightershot');
+      if (enemyFighter) {
+        this.createExplosion(enemyFighter.x, enemyFighter.y);
       }
-      emitter.emit(`ENEMY_DESTROYED_${enemyFighter.name}`);
-      enemyFighter.destroy();
+      
+      if (enemyFighter) {
+        if ('fireEmitter' in enemyFighter) {
+          enemyFighter.fireEmitter.remove();
+        }
+        // emitter.emit(`ENEMY_DESTROYED_${enemyFighter.name}`);
+        this.events.off('ENEMY_SHIPS_SHIELDS_CHANGE');
+        enemyFighter.destroy();
+      }
     } else if (enemyFighterShield < 50 && !enemyFighter.fireEmitter) {
       this.createFire(enemyFighter);
     }
@@ -212,21 +269,22 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     if (this.model.shipShields === 0) {
-      const explosion = this.add.sprite(this.ship.x, this.ship.y, 'exp');
-      explosion.play('boom');
+      emitter.emit('PLAY_SOUND', 'fightershot');
+      this.createExplosion(this.ship.x, this.ship.y);
       if ('fireEmitter' in this.ship) {
         this.ship.fireEmitter.remove();
       }
+      this.events.off('SHIP_SHIELDS_CHANGE');
       this.ship.destroy();
       this.model.gameOver = true;
+			this.transition();
     }
   }
 
   createFire(object) {
-    const particles = this.add.particles('fire');
     const { start, end } = object.name === 'ENEMY_STATION' ? CONFIG_SIZE.STATION_DAMAGE : CONFIG_SIZE.SHIP_DAMAGE; 
 
-    object.fireEmitter = particles.createEmitter({
+    object.fireEmitter = this.particles.createEmitter({
       alpha: { start: 1, end: 0 },
       scale: { start, end },
       speed: 20,
@@ -293,9 +351,7 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
 	shipDestroysStation(station, bullet) {
-		const explosion = this.add.sprite(bullet.x, bullet.y, 'exp');
 		bullet.destroy();
-		explosion.play('boom');
     if (
       Align.detectProximity(
         station,
@@ -304,15 +360,19 @@ export default class PlayScene extends Phaser.Scene {
       )
     ) {
       this.model.enemyStationShields -= 10;
+      emitter.emit('PLAY_SOUND', 'explosionSound');
     } else {
       this.model.enemyStationShields -= 5;
+      emitter.emit('PLAY_SOUND', 'fightershot');
     }
+    
+		this.createExplosion(bullet.x, bullet.y);
 	}
 
 	enemyDestroysShip(ship, bullet) {
 		bullet.destroy();
-		const explosion = this.add.sprite(ship.x, ship.y, 'exp');
-		explosion.play('boom');
+    emitter.emit('PLAY_SOUND', 'fightershot');
+    this.createExplosion(ship.x, ship.y);
 		this.cameras.main.shake(200);
 		this.model.shipShields -= 5;
 	}
@@ -338,15 +398,19 @@ export default class PlayScene extends Phaser.Scene {
 
 	rockDestroyShip(ship, rock) {
 		rock.destroy();
-		const explosion = this.add.sprite(ship.x, ship.y, 'exp');
-    explosion.play('boom');
+    emitter.emit('PLAY_SOUND', 'fightershot');
+		// const explosion = this.add.sprite(ship.x, ship.y, 'exp');
+    // explosion.play('boom');
+    this.createExplosion(ship.x, ship.y);
     this.model.shipShields -= 1;
 	}
 
 	destroyRocks(bullet, rock) {
     bullet.destroy();
-    const explosion = this.add.sprite(rock.x, rock.y, 'exp');
-    explosion.play('boom');
+    emitter.emit('PLAY_SOUND', 'fightershot')
+    // const explosion = this.add.sprite(rock.x, rock.y, 'exp');
+    // explosion.play('boom');
+    this.createExplosion(rock.x, rock.y);
     rock.destroy();
   }
 
@@ -374,6 +438,8 @@ export default class PlayScene extends Phaser.Scene {
 		}
 
 		this.lastBullet = this.getTimer();
+    emitter.emit('PLAY_SOUND', 'gunshot');
+
 		const bullet = this.physics.add.sprite(0, 0, 'bullet');
 		this.bulletGroup.add(bullet);
     bullet.originX = this.ship.x;
@@ -454,9 +520,10 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
 	shipDestroysEnemy(ship, bullet) {
-		const explosion = this.add.sprite(bullet.x, bullet.y, 'exp');
+    emitter.emit('PLAY_SOUND', 'fightershot');
+    this.createExplosion(bullet.x, bullet.y)
 		bullet.destroy();
-		explosion.play('boom');
+    emitter.emit('PLAY_SOUND', 'fightershot');
     // debugger;
 		this.model.enemyShipShields = {
 			key: ship.name,
@@ -574,7 +641,7 @@ export default class PlayScene extends Phaser.Scene {
 				this.ship,
 				this.enemyStation.range
 			) &&
-			!this.missile && !this.model.gameOver && !this.enemyStation
+			!this.missile && !this.model.gameOver && this.enemyStation
 		) {
 			this.missile = new Missile({
 				scene: this,

@@ -14,7 +14,7 @@ export default class LoadScene extends Phaser.Scene {
 			cols: 15,
 			color: 'white',
 		});
-		grid.showNumbers();
+		// grid.showNumbers();
 
 		this.progressBar = new Bar({ scene: this, color: 0x40E0D0 });
 		grid.placeAt(123, this.progressBar);
@@ -24,7 +24,7 @@ export default class LoadScene extends Phaser.Scene {
 		this.load.image('bullet', '/static/bullet.png');
 		this.load.image('ebullet', '/static/ebullet.png');
 		this.load.image('player', '/static/player.png');
-		this.load.image('eship', '/static/eship.png');
+		this.load.image('eship', '/static/eship2.png');
 		this.load.image('title', '/static/title.png');
 		this.load.spritesheet('exp', '/static/exp.png', {
 			frameWidth: 60,
@@ -39,9 +39,12 @@ export default class LoadScene extends Phaser.Scene {
 			startFrame: 0,
 			endFrame: 3,
 		});	
-		this.load.image('buttonBackground', '/static/button.png');
+		this.load.image('button', '/static/button.png');
 		this.load.image('enemyStation', '/static/enemystation2.png');
 		this.load.image('missile', '/static/missile.png');
+    this.load.audio('gunshot', '/static/gunshot.mp3');
+    this.load.audio('explosionSound', '/static/explosion.mp3');
+    this.load.audio('fightershot', '/static/fightershot.mp3');
 		// this.load.json('shapes', '/static/shapes.json');
 	}
 

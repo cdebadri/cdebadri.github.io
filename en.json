@@ -6,5 +6,10 @@
   "gameStory": {
     "title": "Space Saga",
     "body": "An awesome body"
+  },
+  "endScene": {
+    "defeatMessage": "Defeat",
+    "victoryMessage": "Victory",
+    "playAgainButton": "Play Again"
   }
 }

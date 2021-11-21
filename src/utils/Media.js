@@ -1,30 +1,51 @@
 export default class Media {
 	constructor(config) {
 		this.scene = config.scene;
+    this._soundOn = true;
+    this._musicOn = true;
 		emitter.on('PLAY_SOUND', this.playSound, this);
 		emitter.on('PLAY_BACKGROUND_MUSIC', this.playBackground, this);
 		emitter.on('SOUND_SETTINGS_CHANGED', this.updateSettings, this);
+    emitter.on('MUSIC_SETTINGS_CHANGED', this.updateSettings, this);
 	}
 
+  set soundOn(flag) {
+    this._soundOn = flag;
+    emitter.emit('SOUND_SETTINGS_CHANGED');
+  }
+
+  get soundOn() {
+    return this._soundOn;
+  }
+
+  set musicOn(flag) {
+    this._musicOn = flag;
+    emitter.emit('MUSIC_SETTINGS_CHANGED');
+  }
+
+  get musicOn() {
+    return this._musicOn;
+  }
+
 	updateSettings() {
-		if (!model.soundOn && this.backgroundMusic) {
+		if (!this.musicOn && this.backgroundMusic) {
 			this.backgroundMusic.stop();
 		} else {
-			if (this.backgroundMusic) {
+			if (this.musicOn && this.backgroundMusic) {
 				this.backgroundMusic.play();
 			}
 		}
 	}
 
 	playSound(key) {
-		if (model.soundOn) {
+		if (this.soundOn) {
 			this.sound = this.scene.sound.add(key);
 			this.sound.play();
 		}
 	}
 
 	playBackground(key, options) {
-		if (model.soundOn) {
+		if (this.musicOn) {
 			this.backgroundMusic = this.scene.sound.add(key, {...options});
 			this.backgroundMusic.play();
 		}

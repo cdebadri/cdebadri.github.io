@@ -9,8 +9,7 @@ export default class Model {
 	  	'fighter-3': 100,
 	  	'fighter-4': 100,
 	  };
-	  this._enemyStationShields = 10;
-	  this._soundOn = true;
+	  this._enemyStationShields = 20;
 	  this._gameOver = false;
 	}
 
@@ -20,15 +19,6 @@ export default class Model {
 
 	get gameOver() {
 		return this._gameOver;
-	}
-
-	set soundOn(val) {
-		this._soundOn = val;
-		emitter.emit('SOUND_SETTINGS_CHANGED');
-	}
-
-	get soundOn() {
-		return this._soundOn;
 	}
 
 	set shipShields(val) {

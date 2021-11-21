@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const copyWebpackPlugin = require('copy-webpack-plugin');
+const lang = require('./en');
 
 module.exports = {
   entry: './src/index.js',
@@ -56,6 +57,7 @@ module.exports = {
     new webpack.DefinePlugin({
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true),
+      lang: JSON.stringify(lang),
     }),
     new htmlWebpackPlugin({
       inject: true,

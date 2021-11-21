@@ -21,6 +21,11 @@ export const CONFIG_SIZE_LARGE_SCREEN = config => ({
   },
   SHIP_HEALTH_POSITION: 168,
   ENEMY_STATION_EXPLOSION_FIRE: 10,
+  GAME_WIDTH: config.width,
+  END_SCENE: {
+    message: 82,
+    button: 112,
+  }
 })
 
 export const CONFIG_SIZE_SMALL_SCREEN = config => ({
@@ -50,5 +55,10 @@ export const CONFIG_SIZE_SMALL_SCREEN = config => ({
   },
   SHIP_HEALTH_POSITION: 153,
   ENEMY_STATION_EXPLOSION_FIRE: 5,
+  GAME_WIDTH: config.width,
+  END_SCENE: {
+    message: 82,
+    button: 112,
+  }
 });
 
