@@ -3,6 +3,9 @@ export default class Media {
 		this.scene = config.scene;
     this._soundOn = true;
     this._musicOn = true;
+		if (!this.soundGroup) {
+			this.soundGroup = {};
+		}
 		emitter.on('PLAY_SOUND', this.playSound, this);
 		emitter.on('PLAY_BACKGROUND_MUSIC', this.playBackground, this);
 		emitter.on('SOUND_SETTINGS_CHANGED', this.updateSettings, this);
@@ -39,8 +42,10 @@ export default class Media {
 
 	playSound(key) {
 		if (this.soundOn) {
-			this.sound = this.scene.sound.add(key);
-			this.sound.play();
+			if (!this.soundGroup[key]) {
+				this.soundGroup[key] = this.scene.sound.add(key);
+			}
+			this.soundGroup[key].play();
 		}
 	}
 

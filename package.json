@@ -11,7 +11,7 @@
   "author": "Debadri Chowdhury",
   "license": "ISC",
   "dependencies": {
-    "phaser": "^3.55.2",
+    "phaser": "git+https://github.com/photonstorm/phaser.git#v3.60.0-beta.3",
     "phaser3-rex-plugins": "^1.1.50"
   },
   "devDependencies": {

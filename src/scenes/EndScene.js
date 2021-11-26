@@ -54,7 +54,7 @@ export default class EndScene extends Phaser.Scene {
 
     emitter.on('RESTART_GAME', this.restartGame, this);
     
-    this.grid.showNumbers();
+    // this.grid.showNumbers();
   }
 
   destroyObjects() {
@@ -65,7 +65,7 @@ export default class EndScene extends Phaser.Scene {
 
   restartGame() {
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function() {
-			this.scene.start('PlayScene');
+			this.scene.restart('PlayScene');
 		}, this);
 		this.cameras.main.fadeOut(2000, 0, 0, 0);
   }

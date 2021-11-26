@@ -33,7 +33,7 @@ window.updateTemplateDOM = function(eventName) {
 updateTemplateDOM('SHOW_GAME_AREA_LOADING');
 
 const config = isMobile === -1 ? {
-	type: Phaser.AUTO,
+	type: Phaser.CANVAS,
   parent: 'app',
   width: window.innerWidth * 0.6,
   height: window.innerHeight * 0.7,
@@ -41,9 +41,12 @@ const config = isMobile === -1 ? {
   physics: {
     default: 'arcade',
   	arcade: {
-  		debug: false,
+  		debug: true,
   	},
-  }
+  },
+  audio: {
+    disableWebAudio: true,
+  },
 } : {
   type: Phaser.AUTO,
   parent: 'app',

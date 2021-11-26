@@ -53,6 +53,7 @@ export default class LoadScene extends Phaser.Scene {
 	}
 
 	create() {
+    this.progressBar.destroy();
 		this.scene.start('PlayScene');
 	}
 }
