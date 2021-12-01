@@ -65,7 +65,7 @@ export default class EndScene extends Phaser.Scene {
 
   restartGame() {
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function() {
-			this.scene.restart('PlayScene');
+			this.scene.start('PlayScene');
 		}, this);
 		this.cameras.main.fadeOut(2000, 0, 0, 0);
   }

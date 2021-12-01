@@ -40,16 +40,13 @@ export default class PlayScene extends Phaser.Scene {
 			this.createFireButton();
 		}
 
-    if (!this.shipGroup) {
-      this.shipGroup = this.physics.add.group({
-        defaultKey: 'player',
-      });
-    }
-    // this.shipGroup = this.physics.add.group({
-    //   defaultKey: 'player',
-    // });
+		this.shipGroup = this.physics.add.group({
+			defaultKey: 'player',
+			scene: this,
+		});
 
-		this.ship = this.shipGroup.get(0, 0, 'player', undefined, true);
+		this.ship = this.shipGroup.get();
+		this.ship.enableBody(true, 0, 0, true, true);
 		Align.scaleToGameW(this.ship, CONFIG_SIZE.SHIP);
 		this.setShipConfigurations();
 		this.ship.body.collideWorldBounds = true;
@@ -59,42 +56,33 @@ export default class PlayScene extends Phaser.Scene {
 
 		// this.isEnemyAvailable = false;
 
-    if (!this.bulletGroup) {
-		  this.bulletGroup = this.physics.add.group({
-        defaultKey: 'bullet',
-        runChildUpdate: true,
-      });
-    }
+		this.bulletGroup = this.physics.add.group({
+			defaultKey: 'bullet',
+			runChildUpdate: true,
+		});
 
-    if (!this.enemyBulletGroup) {
-		  this.enemyBulletGroup = this.physics.add.group({
-        defaultKey: 'ebullet',
-        runChildUpdate: true,
-      });
-    }
+		this.enemyBulletGroup = this.physics.add.group({
+			defaultKey: 'ebullet',
+			runChildUpdate: true,
+		});
 
-    if (!this.rockGroup) {
-      this.rockGroup = this.physics.add.group({
-        key: 'rocks',
-        frame: [0, 1, 2],
-        frameQuantity: 5,
-        bounceX: 1,
-        bounceY: 1,
-        angularVelocity: 1,
-        collideWorldBounds: true,
-        runChildUpdate: true,
-      });
-      this.createRocks();
-    } else {
-      this.reuseGroup(this.rockGroup);
-    }
+		this.rockGroup = this.physics.add.group({
+			key: 'rocks',
+			frame: [0, 1, 2],
+			frameQuantity: 5,
+			bounceX: 1,
+			bounceY: 1,
+			angularVelocity: 1,
+			collideWorldBounds: true,
+			runChildUpdate: true,
+		});
 
-    if (!this.enemyStationGroup) {
-      this.enemyStationGroup = this.physics.add.group({
-        defaultKey: 'enemyStation',
-      })
-    }
+    this.createRocks();
 
+		this.enemyStationGroup = this.physics.add.group({
+			defaultKey: 'enemyStation',
+		});
+	
     this.enemyStation = this.enemyStationGroup.get(
       Math.floor(this.background.displayWidth / 2),
       Math.floor(this.background.displayHeight / 2),
@@ -105,11 +93,10 @@ export default class PlayScene extends Phaser.Scene {
 		Align.scaleToGameW(this.enemyStation, CONFIG_SIZE.ENEMY_STATION);
 		this.enemyStation.body.setCircle(CONFIG_SIZE.ENEMY_STATION_BODY * game.config.height);
 
-    if (!this.enemyFightersGroup) {
-      this.enemyFightersGroup = this.physics.add.group({
-        defaultKey: 'eship'
-      });
-    }
+		this.enemyFightersGroup = this.physics.add.group({
+			defaultKey: 'eship'
+		});
+	
 		this.setEnemyStationConfigurations();
     this.createEnemyFighter();
 
@@ -122,11 +109,15 @@ export default class PlayScene extends Phaser.Scene {
       repeat: false,
     });
 
-    if (!this.explosionGroup) {
-      this.explosionGroup = this.add.group({
-        defaultKey: 'exp',
-      });
-    }
+		this.explosionGroup = this.add.group({
+			defaultKey: 'exp',
+		});
+
+    this.missileGroup = new Missile({
+      world: this.physics.world,
+      scene: this,
+      key: 'missile',
+    });
 
 		this.particles = this.add.particles('fire');
 
@@ -143,13 +134,6 @@ export default class PlayScene extends Phaser.Scene {
     // emitter.on('ENEMY_STATION_DESTROYED', this.destroyEnemyStation, this);
 		// this.grid.showNumbers();
 	}
-
-  reuseGroup(group) {
-    group.children.each(function(child) {
-      child.setActive(true);
-      child.setVisible(true);
-    });
-  }
 
   destroyEnemyStation() {
     // this.events.off('ENEMY_STATION_DESTROYED');
@@ -173,6 +157,16 @@ export default class PlayScene extends Phaser.Scene {
     this.playerHealth.destroy();
 		this.particles.destroy();
 		this.background.destroy();
+		this.shipGroup.clear(true, true);
+		this.enemyBulletGroup.clear(true, true);
+		this.rockGroup.clear(true, true);
+		this.enemyFightersGroup.clear(true, true);
+		this.enemyStationGroup.clear(true, true);
+		this.bulletGroup.clear(true, true);
+    if (this.stationExplosionFireGroup) {
+		  this.stationExplosionFireGroup.clear(true, true);
+    }
+		this.explosionGroup.clear(true, true);
 	}
 
   // takingFire(object) {
@@ -208,12 +202,14 @@ export default class PlayScene extends Phaser.Scene {
       if (this.enemyStation && 'fireEmitter' in this.enemyStation) {
         this.enemyStation.fireEmitter.remove();
       }
-			if (!this.stationExplosionFireGroup) {
-				this.stationExplosionFireGroup = this.add.group({
-					defaultKey: 'fire',
-				});
-			}
-      this.stationExplosionFire = this.stationExplosionFireGroup.get(this.enemyStation.x, this.enemyStation.y, undefined, undefined, true);
+
+			this.stationExplosionFireGroup = this.add.group({
+				defaultKey: 'fire',
+			});
+
+      this.stationExplosionFire = this.stationExplosionFireGroup.get(this.enemyStation.x, this.enemyStation.y);
+      this.stationExplosionFire.setActive(true);
+      this.stationExplosionFire.setVisible(true);
       // this.effects.enemyStationDestruction({ targets: this.stationExplosionFire });
       // this.enemyStation.destroy();
       const vanish = this.tweens.create({
@@ -385,18 +381,18 @@ export default class PlayScene extends Phaser.Scene {
 
 	setColliders() {
 		this.physics.add.collider(this.rockGroup);
-		this.physics.add.overlap(this.bulletGroup, this.rockGroup, this.destroyRocks, this.shouldProcessOverlap, this);
-		this.physics.add.overlap(this.ship, this.rockGroup, this.rockDestroyShip, this.shouldProcessOverlap, this);
-		this.physics.add.overlap(this.enemyBulletGroup, this.rockGroup, this.destroyRocksEnemy, this.shouldProcessOverlap, this);
-		this.physics.add.overlap(this.ship, this.enemyBulletGroup, this.enemyDestroysShip, this.shouldProcessOverlap, this);
+		this.physics.add.overlap(this.bulletGroup, this.rockGroup, this.destroyRocks, PlayScene.shouldProcessOverlap, this);
+		this.physics.add.overlap(this.ship, this.rockGroup, this.rockDestroyShip, PlayScene.shouldProcessOverlap, this);
+		this.physics.add.overlap(this.enemyBulletGroup, this.rockGroup, this.destroyRocksEnemy, PlayScene.shouldProcessOverlap, this);
+		this.physics.add.overlap(this.ship, this.enemyBulletGroup, this.enemyDestroysShip, PlayScene.shouldProcessOverlap, this);
 
 		this.physics.add.collider(this.enemyFightersGroup, this.rockGroup);
 		this.physics.add.collider(this.enemyStation, this.rockGroup);
-		this.physics.add.overlap(this.enemyFightersGroup, this.bulletGroup, this.shipDestroysEnemy, this.shouldProcessOverlap, this);
-		this.physics.add.overlap(this.enemyStation, this.bulletGroup, this.shipDestroysStation, this.shouldProcessOverlap, this);
+		this.physics.add.overlap(this.enemyFightersGroup, this.bulletGroup, this.shipDestroysEnemy, PlayScene.shouldProcessOverlap, this);
+		this.physics.add.overlap(this.enemyStation, this.bulletGroup, this.shipDestroysStation, PlayScene.shouldProcessOverlap, this);
 	}
 
-	shouldProcessOverlap(object1, object2) {
+	static shouldProcessOverlap(object1, object2) {
 		return object1.active && object2.active;
 	}
 
@@ -692,8 +688,7 @@ export default class PlayScene extends Phaser.Scene {
 			) &&
 			!this.missile && !this.model.gameOver && this.enemyStation
 		) {
-			this.missile = new Missile({
-				scene: this,
+			this.missile = this.missileGroup.spawn({
 				x: this.enemyStation.x,
 				y: this.enemyStation.y,
 				shipX: this.ship.x,
@@ -706,7 +701,6 @@ export default class PlayScene extends Phaser.Scene {
 						this.ship.y
 					)
 				),
-				key: 'missile',
 			});
 			this.missileRecalibrationTime = new Date().getTime();
 			this.physics.add.collider(this.missile, this.ship, this.missileDestroysShip, null, this);
@@ -715,14 +709,14 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
 	rocksDestroyMissile(missile, rock) {
-		missile.destroy();
+    missile.disableBody(true, true);
 		this.missile = null;
 		this.createExplosion(rock.x, rock.y);
 		rock.disableBody(true, true);
 	}
 
 	missileDestroysShip(missile, ship) {
-		missile.destroy();
+		missile.disableBody(true, true);
 		this.missile = null;
 		this.createExplosion(ship.x, ship.y);
     this.model.shipShields = 0;
@@ -735,6 +729,7 @@ export default class PlayScene extends Phaser.Scene {
 		) {
 			this.missile.emit(
 				'RECALIBRATE',
+        this.missile,
 				Align.toDegrees(
 					Phaser.Math.Angle.Between(
 						this.missile.x,

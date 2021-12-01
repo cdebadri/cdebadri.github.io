@@ -1,33 +1,44 @@
 import * as Phaser from 'phaser';
 import { Align } from '../utils';
 
-export default class Missile extends Phaser.Physics.Arcade.Sprite {
-	constructor({ scene, x, y, key, angle, shipX, shipY }) {
-		super(scene, x, y, key);
-		this.scene = scene;
-		this.shipX = shipX;
-		this.shipY = shipY
-		this.angle = angle + 90;
-		Align.scaleToGameW(this, .02);
+export default class Missile {
+	constructor({ world, scene, key }) {
+		this.group = new Phaser.Physics.Arcade.Group(world, scene, {
+      defaultKey: key,
+      runChildUpdate: true,
+    });
 
-		scene.add.existing(this);
-		scene.physics.add.existing(this);
-		// this.setCollideWorldBounds(true);
+    this.scene = scene;
+	}
+	
+  spawn({ x, y, angle, shipX, shipY }) {
+		const missile = this.group.get();
 
-		this.recalibratePosition();
-		this.addListener('RECALIBRATE', this.recalibratePosition, this);
+    missile.enableBody(true, x, y, true, true);
+		missile.shipX = shipX;
+		missile.shipY = shipY
+		missile.angle = angle + 90;
+		Align.scaleToGameW(missile, .02);
+
+		this.scene.add.existing(missile);
+		this.scene.physics.add.existing(missile);
+
+		this.recalibratePosition(missile);
+		missile.addListener('RECALIBRATE', this.recalibratePosition, missile);
+    
+		return missile;
 	}
 
-	recalibratePosition(angle = null, posx = null, posy = null) {
-		let x = this.shipX;
-		let y = this.shipY;
+	recalibratePosition(missile, angle = null, posx = null, posy = null) {
+		let x = missile.shipX;
+		let y = missile.shipY;
 
 		if (angle && posx && posy) {
-			this.angle = angle + 90;
+			missile.angle = angle + 90;
 			x = posx;
 			y = posy;
 		}
 
-		this.scene.physics.moveTo(this, x, y, 200);
+		this.scene.physics.moveTo(missile, x, y, 200);
 	}
 }
