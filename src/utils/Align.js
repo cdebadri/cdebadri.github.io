@@ -40,4 +40,6 @@ module.exports = {
 	},
 
   clamp: (min, num, max) => Math.min(Math.max(num, min), max),
+
+  secsToMins: time => `${Math.floor(time / 60)}:${Math.floor(time % 60)}`,
 }

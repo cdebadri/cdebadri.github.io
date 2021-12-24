@@ -25,7 +25,10 @@ export const CONFIG_SIZE_LARGE_SCREEN = config => ({
   END_SCENE: {
     message: 82,
     button: 112,
-  }
+  },
+  GAME_TIME: 120000,
+  TIMER_POSITION: 13.6,
+  PLAY_BUTTON_SIZE: 1,
 })
 
 export const CONFIG_SIZE_SMALL_SCREEN = config => ({
@@ -59,6 +62,9 @@ export const CONFIG_SIZE_SMALL_SCREEN = config => ({
   END_SCENE: {
     message: 82,
     button: 112,
-  }
+  },
+  GAME_TIME: 120000,
+  TIMER_POSITION: 12,
+  PLAY_BUTTON_SIZE: 0.1,
 });
 

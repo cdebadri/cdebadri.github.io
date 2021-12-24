@@ -2,7 +2,15 @@ const path = require('path');
 const webpack = require('webpack');
 const htmlWebpackPlugin = require('html-webpack-plugin');
 const copyWebpackPlugin = require('copy-webpack-plugin');
+const handlebars = require('handlebars');
 const lang = require('./en');
+const modal = require('./views/modal.handlebars');
+const story = require('./views/story.handlebars');
+
+handlebars.registerPartial({
+  story,
+  modal,
+});
 
 module.exports = {
   entry: './src/index.js',
@@ -78,6 +86,6 @@ module.exports = {
     publicPath: '/',
     compress: true,
     port: 3000,
-    // host: '192.168.43.201',
+    host: '192.168.0.104',
   },
 }

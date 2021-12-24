@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick';
-import { Grid, Align, Model, Bar, Media } from '../utils';
+import { Grid, Align, Model, Bar, Media, Text } from '../utils';
 import { FindClosest, Missile } from '../components';
 import CleanupGroup from '../components/CleanupGroup';
 
@@ -131,8 +131,36 @@ export default class PlayScene extends Phaser.Scene {
 		emitter.on('SHIP_SHIELDS_CHANGE', this.changePlayerShieldValue, this);
     emitter.on('ENEMY_SHIPS_SHIELDS_CHANGE', this.checkEnemyShields, this);
     emitter.on('ENEMY_STATION_SHIELDS_CHANGE', this.checkEnemyStationShields, this);
-    // emitter.on('ENEMY_STATION_DESTROYED', this.destroyEnemyStation, this);
+
+		this.setupClock();
+    this.scene.launch('PauseScene', { sceneKey: 'PlayScene' });
+    this.scene.pause('PlayScene');
 		// this.grid.showNumbers();
+	}
+
+	setupClock() {
+		this.timeTeller = this.time.addEvent({
+			delay: CONFIG_SIZE.GAME_TIME,
+      callbackScope: this,
+      callback: function () {
+        this.model.gameOver = true;
+        this.transition();
+      },
+		});
+
+    this.timeTellerText = new Text.createText({
+      scene: this,
+      text: `Time Left\n${Align.secsToMins(this.timeTeller.getRemainingSeconds())}`,
+      style: {
+        backgroundColor: 0xffffff,
+        align: 'center'
+      },
+    });
+
+    this.add.existing(this.timeTellerText);
+    this.grid.placeAt(CONFIG_SIZE.TIMER_POSITION, this.timeTellerText, 'corner');
+    this.timeTellerText.setScrollFactor(0);
+    this.timeTellerText.setDepth(1);
 	}
 
   destroyEnemyStation() {
@@ -639,11 +667,19 @@ export default class PlayScene extends Phaser.Scene {
 	fallbackToKeyboard() {
 		const cursors = this.input.keyboard.createCursorKeys();
 		const keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    const keySpace = this.input.keyboard.addKey('SPACE');
 		let stop = false;
 
 		if (keyS.isDown) {
 			this.makeBullets();
 		}
+
+    if (keySpace.isDown) {      
+      this.scene.launch('PauseScene', {
+        sceneKey: 'PlayScene',
+      });
+      this.scene.pause('PlayScene');
+    }
 
     // keyS.on('down', this.makeBullets, this);
 
@@ -760,6 +796,7 @@ export default class PlayScene extends Phaser.Scene {
   }
 
 	update() {
+    this.timeTellerText.setText(`Time Left\n${Align.secsToMins(this.timeTeller.getRemainingSeconds())}`);
 		if (!isMobile) {
 			this.fallbackToKeyboard();
 		}

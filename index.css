@@ -19,7 +19,7 @@ body {
     margin-top: 40px;
   }
   
-  #md-loader-container {
+  #loader-container {
     background-color: black;
     height: 60vh;
     width: 60vw;
@@ -27,6 +27,27 @@ body {
     align-items: center;
     justify-content: center;
   } 
+}
+
+@media screen and (max-width: 1024px) {
+  .game-area {
+    margin: 0;
+  }
+
+  #container {
+    margin: 0;
+  }
+
+  #loader-container {
+    background-color: black;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+  }
+
+  .mobile-screen {
+    display: none;
+  }
 }
 
 .loader,
@@ -97,4 +118,22 @@ body {
 
 .text {
   color: white;
+}
+
+.modal {
+  position: absolute;
+  top: calc(20vh);
+  left: calc(20vw);
+  z-index: 3;
+  width: 60vw;
+  height: 60vh;
+  text-align: center;
+  display: none;
+  background-color: grey;
+}
+
+.modal > button {
+  border-radius: 10px;
+  background-color: #cc0000;
+  color: black;
 }
