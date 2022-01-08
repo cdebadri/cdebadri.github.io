@@ -86,6 +86,6 @@ module.exports = {
     publicPath: '/',
     compress: true,
     port: 3000,
-    host: '192.168.0.104',
+    // host: '127.0.0.1',
   },
 }

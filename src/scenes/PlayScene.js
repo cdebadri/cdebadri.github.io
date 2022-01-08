@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick';
-import { Grid, Align, Model, Bar, Media, Text } from '../utils';
+import { Grid, Align, Model, Bar, Media, Text, ButtonWrapper } from '../utils';
 import { FindClosest, Missile } from '../components';
 import CleanupGroup from '../components/CleanupGroup';
 
@@ -38,6 +38,7 @@ export default class PlayScene extends Phaser.Scene {
 		if (isMobile) {
 			this.createJoystick();
 			this.createFireButton();
+      this.messageIconForMobile();
 		}
 
 		this.shipGroup = this.physics.add.group({
@@ -131,12 +132,35 @@ export default class PlayScene extends Phaser.Scene {
 		emitter.on('SHIP_SHIELDS_CHANGE', this.changePlayerShieldValue, this);
     emitter.on('ENEMY_SHIPS_SHIELDS_CHANGE', this.checkEnemyShields, this);
     emitter.on('ENEMY_STATION_SHIELDS_CHANGE', this.checkEnemyStationShields, this);
-
+    emitter.on('SHOW_INFO', this.showInfo, this);
+    emitter.on('FIRE', this.makeBullets, this);
+    this.pauseGame()
 		this.setupClock();
-    this.scene.launch('PauseScene', { sceneKey: 'PlayScene' });
-    this.scene.pause('PlayScene');
+    
 		// this.grid.showNumbers();
 	}
+
+  pauseGame() {
+    this.scene.launch('PauseScene', { sceneKey: 'PlayScene' });
+    this.scene.pause('PlayScene');
+  }
+
+  showInfo() {
+    updateTemplateDOM('SHOW_MOBILE_INSTRUCTIONS');
+    this.pauseGame();
+  }
+
+  messageIconForMobile() {
+    this.infoButton = new ButtonWrapper({
+      scene: this,
+      key: 'info',
+      event: 'SHOW_INFO',
+      scaleFactor: CONFIG_SIZE.MESSAGE_ICON_BUTTON_SIZE,
+    });
+    // this.infoButton.setDepth(2);
+    // this.infoButton.setScrollFactor(0);
+    this.grid.placeAt(CONFIG_SIZE.MESSAGE_ICON_PLACE, this.infoButton, 'corner');
+  }
 
 	setupClock() {
 		this.timeTeller = this.time.addEvent({
@@ -370,16 +394,13 @@ export default class PlayScene extends Phaser.Scene {
 
 	createFireButton() {
 		// fire button needs to be changed
-		this.fireButton = this.add.circle(
-			0, 
-			0, 
-			Math.floor(CONFIG_SIZE.FIRE_BUTTON * game.config.height), 
-			0xff0000, 
-			0.5
-		);
+		this.fireButton = new ButtonWrapper({
+      scene: this,
+      key: 'firebutton',
+      scaleFactor: CONFIG_SIZE.FIRE_BUTTON_SIZE,
+      event: 'FIRE',
+    });
 		this.fireButton.setScrollFactor(0);
-		this.fireButton.setInteractive();
-		this.fireButton.on('pointerdown', this.makeBullets, this);
 		this.grid.placeAt(121, this.fireButton);
 	}
 
@@ -824,7 +845,7 @@ export default class PlayScene extends Phaser.Scene {
 
 		this.fireMissile();
 		this.recalibrateMissile();
-    // this.destroyChildren(this.bulletGroup);
-    // this.destroyChildren(this.enemyBulletGroup);
+    this.destroyChildren(this.bulletGroup);
+    this.destroyChildren(this.enemyBulletGroup);
 	}
 }
