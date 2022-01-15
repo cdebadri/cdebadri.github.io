@@ -49,10 +49,12 @@ export default class Media {
 		}
 	}
 
-	playBackground(key, options) {
+	playBackground(key) {
 		if (this.musicOn) {
-			this.backgroundMusic = this.scene.sound.add(key, {...options});
-			this.backgroundMusic.play();
+      if (!this.soundGroup[key]) {
+  			this.soundGroup[key] = this.scene.sound.add(key, { loop: true, volume: 0.25 });
+      }
+			this.soundGroup[key].play();
 		}
 	}
 }

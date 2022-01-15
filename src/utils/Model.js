@@ -9,7 +9,7 @@ export default class Model {
 	  	'fighter-3': 100,
 	  	'fighter-4': 100,
 	  };
-	  this._enemyStationShields = 100;
+	  this._enemyStationShields = 10;
 	  this._gameOver = false;
 	}
 

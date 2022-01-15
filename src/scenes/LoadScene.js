@@ -16,7 +16,7 @@ export default class LoadScene extends Phaser.Scene {
 		});
 		// grid.showNumbers();
 
-		this.progressBar = new Bar({ scene: this, color: 0x40E0D0 });
+		this.progressBar = new Bar({ scene: this, color: 0xff0000 });
 		grid.placeAt(123, this.progressBar);
 
 		this.load.on('progress', this.onProgress, this);
@@ -48,6 +48,7 @@ export default class LoadScene extends Phaser.Scene {
     this.load.image('play', '/static/play.png');
     this.load.image('info', '/static/info.png');
     this.load.image('firebutton', '/static/firebutton.png');
+    this.load.audio('battle', '/static/battle.mp3');
 		// this.load.json('shapes', '/static/shapes.json');
 	}
 

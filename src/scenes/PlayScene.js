@@ -13,10 +13,16 @@ export default class PlayScene extends Phaser.Scene {
 
   init() {
 		this.model = new Model();
-    this.media = new Media({ scene: this });
+    this.media = new Media({ scene: this })
   }
 
 	create() {
+    if (isMobile) {
+      updateTemplateDOM('SHOW_MOBILE_INSTRUCTIONS');
+    }
+
+    emitter.emit('PLAY_BACKGROUND_MUSIC', 'battle');
+
 		this.grid = new Grid({
 			scene: this,
 			rows: 12,
@@ -134,7 +140,7 @@ export default class PlayScene extends Phaser.Scene {
     emitter.on('ENEMY_STATION_SHIELDS_CHANGE', this.checkEnemyStationShields, this);
     emitter.on('SHOW_INFO', this.showInfo, this);
     emitter.on('FIRE', this.makeBullets, this);
-    this.pauseGame()
+    this.pauseGame();
 		this.setupClock();
     
 		// this.grid.showNumbers();
@@ -215,9 +221,13 @@ export default class PlayScene extends Phaser.Scene {
 		this.enemyFightersGroup.clear(true, true);
 		this.enemyStationGroup.clear(true, true);
 		this.bulletGroup.clear(true, true);
-    if (this.stationExplosionFireGroup) {
+
+    if (this.stationExplosionFireGroup && this.stationExplosionFireGroup.children) {
 		  this.stationExplosionFireGroup.clear(true, true);
+    } else {
+      delete this.stationExplosionFireGroup;
     }
+
 		this.explosionGroup.clear(true, true);
 	}
 
@@ -762,6 +772,7 @@ export default class PlayScene extends Phaser.Scene {
 			this.missileRecalibrationTime = new Date().getTime();
 			this.physics.add.collider(this.missile, this.ship, this.missileDestroysShip, null, this);
 			this.physics.add.collider(this.missile, this.rockGroup, this.rocksDestroyMissile, null, this);
+      emitter.emit('PLAY_SOUND', 'gunshot');
 		}
 	}
 

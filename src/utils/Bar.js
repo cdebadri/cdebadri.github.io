@@ -6,7 +6,7 @@ export default class Bar extends Phaser.GameObjects.Container {
 		this.scene = config.scene;
 		this.color = config.color ? config.color : 0xff0000;
 		this.width = config.width ? config.width : Math.floor(0.5 * game.config.width);
-		this.height = config.height ? config.height : Math.floor(0.1 * game.config.height);
+		this.height = config.height ? config.height : Math.floor(0.05 * game.config.height);
 
     this.box = this.scene.add.graphics();
     this.box.lineStyle(4, this.color);

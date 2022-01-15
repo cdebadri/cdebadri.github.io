@@ -6,20 +6,30 @@
       name="viewport"
       content="width=device-width, initial-scale=1, user-scalable=no"
     />
-    <title>Space Battle</title>
+    <title>Space Saga</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link rel="preload" as="font" href="/static/Thectro.ttf" type="font/ttf" crossorigin="anonymous">
     <link rel="shortcut icon" href="/static/favicon.png" />
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="/index.css">
   </head>
   <body>
+    <div class="header">Space Saga</div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="container">
       {{> views/modal }}
       <div class="game-area display-hidden" id="app"></div>
       <div class="mobile-screen">
         {{> views/story }}
+        <h3 class="text headline">{{ instructions.title }}</h3>
+        <div class="text">{{ instructions.body }}</div>
       </div>
     </div>
+    <footer class="footer">
+      <div>&copy;	{{ footer }} &copy;</div>
+    </footer>
     <!-- Scripts will be injected automatically -->
   </body>
 </html>

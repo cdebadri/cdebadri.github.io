@@ -13,15 +13,18 @@ export default class PauseScene extends Phaser.Scene {
   }
 
   create() {
-    this.playButton = this.add.image(game.config.width / 2, game.config.height / 2, 'play');
-    Align.scaleToGameW(this.playButton, CONFIG_SIZE.PLAY_BUTTON_SIZE);
-    this.playButton.setInteractive();
+    if (!isMobile) {
+      this.playButton = this.add.image(game.config.width / 2, game.config.height / 2, 'play');
+      Align.scaleToGameW(this.playButton, CONFIG_SIZE.PLAY_BUTTON_SIZE);
+      // this.playButton.setInteractive();
+    }
 
-    this.playButton.on('pointerdown', function () {
+    emitter.on('PLAY_SCENE', function () {
       this.scene.bringToTop('PlayScene');
       this.scene.resume(this.sceneKey);
       this.scene.stop();
     }, this);
+
     this.scene.bringToTop(this);
   }
 
@@ -38,6 +41,6 @@ export default class PauseScene extends Phaser.Scene {
   update() {
     if (!isMobile) {
       this.fallbackToKeyboard();
-    }
+    } 
   }
 }

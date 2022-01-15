@@ -58,8 +58,8 @@ module.exports = {
       },
     ]
   },
-  mode: 'development',
-  devtool: 'inline-cheap-source-map',
+  mode: process.env.NODE_ENV === 'dev' ? 'development' : undefined,
+  devtool: process.env.NODE_ENV === 'dev' ? 'inline-cheap-source-map' : undefined,
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
@@ -82,10 +82,14 @@ module.exports = {
       ]
     }),
   ],
-  devServer: {
+  optimization: process.env.NODE_ENV === 'prod' ? {
+    minimize: true,
+  } : undefined,
+  devServer: process.env.NODE_ENV === 'dev' ? {
     publicPath: '/',
     compress: true,
     port: 3000,
     // host: '127.0.0.1',
-  },
+    writeToDisk: true,
+  } : undefined,
 }

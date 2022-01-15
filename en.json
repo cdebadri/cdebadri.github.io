@@ -1,15 +1,23 @@
 {
   "instructions": {
-    "title": "INSTRUCTIONS",
-    "body": "Press the arrow keys to move the plane and S to shoot bullets"
+    "title": "Instructions",
+    "body": "Press the ARROW keys to move the fighter and S to fire bullets. The game can be paused/restarted with SPACE."
   },
   "gameStory": {
     "title": "Space Saga",
-    "body": "An awesome body"
+    "story": {
+      "title": "The saga so far ...",
+      "body": "The enemy has conquered the galaxy and have put the revolting planets under stringent embargo, preventing any weapons or aids from reaching them. While the revolutionary forces are launching small scale guerilla attacks to avenge the plight of the galaxy, they're met with a heavy hand from the superior enemy forces. There's a communication station in deep space which relays information on revolutionary troop movement. We need you, off-worlder, to destroy that station and give the revolutionaries a chance!"
+    },
+    "mission": {
+      "title": "Your Mission",
+      "body": "Destroy the enemy communication station before it can call for reinforcements!"
+    } 
   },
   "endScene": {
-    "defeatMessage": "Defeat",
+    "defeatMessage": "Game Over",
     "victoryMessage": "Victory",
     "playAgainButton": "Play Again"
-  }
+  },
+  "footer": "A Debadri Chowdhury Creation"
 }

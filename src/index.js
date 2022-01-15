@@ -33,15 +33,12 @@ window.updateTemplateDOM = function(eventName) {
       return;
     case 'HIDE_MOBILE_INSTRUCTIONS':
       document.getElementById('mobile_instructions').style.display = 'none';
+      emitter.emit('PLAY_SCENE');
       return;
   }
 };
 
 updateTemplateDOM('SHOW_GAME_AREA_LOADING');
-
-if (isMobile !== -1) {
-  updateTemplateDOM('SHOW_MOBILE_INSTRUCTIONS');
-}
 
 const config = isMobile === -1 ? {
 	type: Phaser.CANVAS,
@@ -54,9 +51,6 @@ const config = isMobile === -1 ? {
   	arcade: {
   		debug: false,
   	},
-  },
-  audio: {
-    disableWebAudio: true,
   },
 } : {
   type: Phaser.AUTO,

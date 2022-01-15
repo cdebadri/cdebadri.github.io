@@ -23,12 +23,12 @@ export const CONFIG_SIZE_LARGE_SCREEN = config => ({
   ENEMY_STATION_EXPLOSION_FIRE: 10,
   GAME_WIDTH: config.width,
   END_SCENE: {
-    message: 82,
+    message: 50,
     button: 112,
   },
   GAME_TIME: 120000,
   TIMER_POSITION: 13.6,
-  PLAY_BUTTON_SIZE: 1,
+  PLAY_BUTTON_SIZE: 0.1,
 })
 
 export const CONFIG_SIZE_SMALL_SCREEN = config => ({
@@ -60,7 +60,7 @@ export const CONFIG_SIZE_SMALL_SCREEN = config => ({
   ENEMY_STATION_EXPLOSION_FIRE: 5,
   GAME_WIDTH: config.width,
   END_SCENE: {
-    message: 82,
+    message: 52,
     button: 112,
   },
   GAME_TIME: 120000,

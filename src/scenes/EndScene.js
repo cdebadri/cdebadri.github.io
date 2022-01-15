@@ -31,12 +31,16 @@ export default class EndScene extends Phaser.Scene {
       text: this.gameOver ? lang.endScene.defeatMessage : lang.endScene.victoryMessage,
       style: {
         align: 'center',
+        fontFamily: 'Thectro',
+        fontSize: isMobile ? '20px' : '40px',
+        color: 'red',
       },
       width: CONFIG_SIZE.GAME_WIDTH,
     });
 
     this.add.existing(this.message);
-    this.grid.placeAt(CONFIG_SIZE.END_SCENE.message, this.message, 'center');
+    this.grid.placeAt(CONFIG_SIZE.END_SCENE.message, this.message);
+    this.message.x = CONFIG_SIZE.GAME_WIDTH / 2 - this.message.width / 2;
 
     this.button = new ButtonWrapper({
       scene: this,
@@ -44,7 +48,8 @@ export default class EndScene extends Phaser.Scene {
       text: lang.endScene.playAgainButton,
       style: {
         color: 'black',
-        align: 'center'
+        align: 'center',
+        fontFamily: 'Roboto'
       },
       event: 'RESTART_GAME',
     });
