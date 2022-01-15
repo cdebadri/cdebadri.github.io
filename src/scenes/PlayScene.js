@@ -183,7 +183,8 @@ export default class PlayScene extends Phaser.Scene {
       text: `Time Left\n${Align.secsToMins(this.timeTeller.getRemainingSeconds())}`,
       style: {
         backgroundColor: 0xffffff,
-        align: 'center'
+        align: 'center',
+        fontFamily: 'Roboto'
       },
     });
 
