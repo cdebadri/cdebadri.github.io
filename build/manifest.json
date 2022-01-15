@@ -1,0 +1,12 @@
+{
+	"name": "Space Battle",
+	"icons": [
+		{
+			"src": "/static/favicon.png",
+			"sizes": "48x48"
+		}
+	],
+	"display": "fullscreen",
+	"orientation": "landscape",
+	"theme_color": "black"
+}
