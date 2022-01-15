@@ -13,7 +13,7 @@ handlebars.registerPartial({
 });
 
 module.exports = {
-  entry: './src/index.js',
+  entry: path.resolve(__dirname, './src/index.js'),
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'main.js',
@@ -23,7 +23,7 @@ module.exports = {
   module: {
     rules: [
       {
-        exclude: /node_modules/,
+        exclude: /node_modules/i,
         test: /\.m?js$/,
         use: {
           loader: 'babel-loader',
@@ -35,10 +35,6 @@ module.exports = {
             ]
           }
         }
-      },
-      {
-        test: /\.css$/i,
-        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(jpg|jpeg|png|svg|mp3|ogg|wav|json)/i,
@@ -58,8 +54,11 @@ module.exports = {
       },
     ]
   },
-  mode: process.env.NODE_ENV === 'dev' ? 'development' : undefined,
+  mode: process.env.NODE_ENV === 'dev' ? 'development' : 'none',
   devtool: process.env.NODE_ENV === 'dev' ? 'inline-cheap-source-map' : undefined,
+  resolve: {
+    extensions: ['.js'],
+  },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
@@ -79,6 +78,7 @@ module.exports = {
           to: path.resolve(__dirname, 'build/static'), 
         },
         './manifest.json',
+        './index.css',
       ]
     }),
   ],

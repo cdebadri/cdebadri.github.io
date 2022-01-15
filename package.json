@@ -1,5 +1,5 @@
 {
-  "name": "spacebattle-v2",
+  "name": "spacesaga.github.io",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "phaser": "git+https://github.com/photonstorm/phaser.git#v3.60.0-beta.3",
-    "phaser3-rex-plugins": "^1.1.50"
+    "phaser3-rex-plugins": "^1.1.65"
   },
   "devDependencies": {
     "@babel/core": "^7.14.3",
@@ -20,6 +20,8 @@
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^9.0.0",
     "cross-env": "^7.0.3",
+    "css-loader": "^6.5.1",
+    "css-minimizer-webpack-plugin": "^3.3.1",
     "file-loader": "^6.2.0",
     "handlebars": "^4.7.7",
     "handlebars-loader": "^1.7.1",
