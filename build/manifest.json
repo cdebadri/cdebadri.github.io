@@ -1,5 +1,5 @@
 {
-	"name": "Space Battle",
+	"name": "Space Saga",
 	"icons": [
 		{
 			"src": "/static/favicon.png",
@@ -7,6 +7,9 @@
 		}
 	],
 	"display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
 	"orientation": "landscape",
-	"theme_color": "black"
+	"theme_color": "black",
+  "start_url": "https://cdebadri.github.io/",
+  "background_color": "black"
 }
