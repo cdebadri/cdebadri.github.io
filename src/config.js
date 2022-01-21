@@ -27,7 +27,7 @@ export const CONFIG_SIZE_LARGE_SCREEN = config => ({
     button: 112,
   },
   GAME_TIME: 120000,
-  TIMER_POSITION: 13.6,
+  TIMER_POSITION: 13.4,
   PLAY_BUTTON_SIZE: 0.1,
 })
 
@@ -64,7 +64,7 @@ export const CONFIG_SIZE_SMALL_SCREEN = config => ({
     button: 112,
   },
   GAME_TIME: 120000,
-  TIMER_POSITION: 12.5,
+  TIMER_POSITION: 12.3,
   PLAY_BUTTON_SIZE: 0.1,
   FIRE_BUTTON_SIZE: 0.25,
   MESSAGE_ICON_BUTTON_SIZE: 0.15,

@@ -6,18 +6,24 @@
       name="viewport"
       content="width=device-width, initial-scale=1, user-scalable=no"
     />
-    <meta name="theme_color">
-    <title>Space Saga</title>
+    <meta name="theme-color" content="#000000">
+    <title>Red Wings</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="shortcut icon" href="/static/favicon.ico" />
+    <link rel="icon" sizes="32x32" href="/static/favicon-32x32.png" />
+    <link rel="icon" sizes="192x192" href="/static/android-chrome-192x192.png" />
+    <link rel="icon" sizes="512x512" href="/static/android-chrome-512x512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png" />
+
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
     <link rel="preload" as="font" href="/static/Thectro.ttf" type="font/ttf" crossorigin="anonymous">
-    <link rel="shortcut icon" href="/static/favicon.png" />
+    <link rel="preload" as="font" href="/static/Digital.ttf" type="font/ttf" crossorigin="anonymous">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="/index.css">
   </head>
   <body>
-    <div class="header">Space Saga</div>
+    <div class="header">{{ gameStory.title }}</div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="container">
       {{> views/modal }}

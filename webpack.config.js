@@ -31,7 +31,8 @@ module.exports = {
             presets: ['@babel/preset-env'],
             plugins: [
               '@babel/plugin-proposal-optional-chaining',
-              '@babel/plugin-proposal-nullish-coalescing-operator'
+              '@babel/plugin-proposal-nullish-coalescing-operator',
+              '@babel/plugin-transform-runtime',
             ]
           }
         }
@@ -65,6 +66,7 @@ module.exports = {
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true),
       lang: JSON.stringify(lang),
+      NODE_ENV: JSON.stringify(process.env.NODE_ENV),
     }),
     new htmlWebpackPlugin({
       inject: true,
@@ -79,6 +81,7 @@ module.exports = {
         },
         './manifest.json',
         './index.css',
+        './service-worker.js',
       ]
     }),
   ],

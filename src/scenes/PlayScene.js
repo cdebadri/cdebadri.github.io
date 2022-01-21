@@ -180,11 +180,13 @@ export default class PlayScene extends Phaser.Scene {
 
     this.timeTellerText = new Text.createText({
       scene: this,
-      text: `Time Left\n${Align.secsToMins(this.timeTeller.getRemainingSeconds())}`,
+      text: `Time left\n${Align.secsToMins(this.timeTeller.getRemainingSeconds())}`,
       style: {
         backgroundColor: 0xffffff,
         align: 'center',
-        fontFamily: 'Roboto'
+        fontFamily: 'Digital',
+        color: 'red',
+        textShadow: '5px 5px 5px red',
       },
     });
 
@@ -535,7 +537,7 @@ export default class PlayScene extends Phaser.Scene {
 
 	setShipConfigurations() {
 		this.ship.angle = -90;
-		this.ship.topSpeed = 120;
+		this.ship.topSpeed = 150;
     // this.takingFire(this.ship);
 	}
 
@@ -555,13 +557,13 @@ export default class PlayScene extends Phaser.Scene {
     bullet.originY = this.ship.y;
 		bullet.angle = this.ship.angle;
 		bullet.body.setVelocity(
-			Math.cos(Align.toRadians(bullet.angle)) * 200,
-			Math.sin(Align.toRadians(bullet.angle)) * 200
+			Math.cos(Align.toRadians(bullet.angle)) * 300,
+			Math.sin(Align.toRadians(bullet.angle)) * 300
 		);
 	}
 
 	setEnemyConfigurations(eship) {
-		eship.topSpeed = 50;
+		eship.topSpeed = 100;
 		eship.range = game.config.height / CONFIG_SIZE.ENEMY_SHIP_DETECTION_DENOM;
 		eship.flyRange = game.config.height / CONFIG_SIZE.ENEMY_SHIP_DETECTION_DENOM;
 		eship.setPushable(false);
@@ -693,7 +695,7 @@ export default class PlayScene extends Phaser.Scene {
 
 		Align.scaleToGameW(bullet, CONFIG_SIZE.ENEMY_BULLET);
 		bullet.angularVelocity = 10;
-		this.physics.moveTo(bullet, this.ship.x, this.ship.y, 200);
+		this.physics.moveTo(bullet, this.ship.x, this.ship.y, 300);
 	}
 
 	fallbackToKeyboard() {
@@ -829,7 +831,7 @@ export default class PlayScene extends Phaser.Scene {
   }
 
 	update() {
-    this.timeTellerText.setText(`Time Left\n${Align.secsToMins(this.timeTeller.getRemainingSeconds())}`);
+    this.timeTellerText.setText(`Time left\n${Align.secsToMins(this.timeTeller.getRemainingSeconds())}`);
 		if (!isMobile) {
 			this.fallbackToKeyboard();
 		}

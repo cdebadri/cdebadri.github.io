@@ -1,15 +1,42 @@
 {
-	"name": "Space Saga",
+	"name": "Red Wings",
 	"icons": [
 		{
-			"src": "/static/favicon.png",
-			"sizes": "48x48"
-		}
+			"src": "/static/favicon.ico",
+			"sizes": "48x48",
+      "type": "image/x-icon",
+      "purpose": "any maskable"
+		}, 
+    {
+      "src": "/static/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
 	],
 	"display": "fullscreen",
   "display_override": ["fullscreen", "standalone", "minimal-ui"],
 	"orientation": "landscape",
 	"theme_color": "black",
-  "start_url": "https://cdebadri.github.io/",
-  "background_color": "black"
+  "start_url": "/",
+  "background_color": "#000000"
 }

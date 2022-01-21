@@ -1,5 +1,5 @@
 import * as Phaser from 'phaser';
-import { Bar, Grid } from '../utils';
+import { Bar, Grid, Text } from '../utils';
 
 export default class LoadScene extends Phaser.Scene {
 	constructor() {
@@ -16,6 +16,21 @@ export default class LoadScene extends Phaser.Scene {
 		});
 		// grid.showNumbers();
 
+    const text = new Text.createText({
+      scene: this,
+      text: lang.gameStory.title,
+      style: {
+        align: 'center',
+        fontFamily: 'Thectro',
+        fontSize: isMobile ? '20px' : '40px',
+        color: 'red',
+      },
+      width: CONFIG_SIZE.GAME_WIDTH,
+    });
+    this.add.existing(text);
+    grid.placeAt(CONFIG_SIZE.END_SCENE.message, text);
+    text.x = CONFIG_SIZE.GAME_WIDTH / 2 - text.width / 2;
+
 		this.progressBar = new Bar({ scene: this, color: 0xff0000 });
 		grid.placeAt(123, this.progressBar);
 
@@ -23,9 +38,8 @@ export default class LoadScene extends Phaser.Scene {
 		this.load.image('background', '/static/background.jpg');
 		this.load.image('bullet', '/static/bullet.png');
 		this.load.image('ebullet', '/static/ebullet.png');
-		this.load.image('player', '/static/player.png');
+		this.load.image('player', '/static/player2.png');
 		this.load.image('eship', '/static/eship2.png');
-		this.load.image('title', '/static/title.png');
 		this.load.spritesheet('exp', '/static/exp.png', {
 			frameWidth: 60,
 			frameHeight: 70,
@@ -46,8 +60,8 @@ export default class LoadScene extends Phaser.Scene {
     this.load.audio('explosionSound', '/static/explosion.mp3');
     this.load.audio('fightershot', '/static/fightershot.mp3');
     this.load.image('play', '/static/play.png');
-    this.load.image('info', '/static/info.png');
-    this.load.image('firebutton', '/static/firebutton.png');
+    this.load.image('info', '/static/info2.png');
+    this.load.image('firebutton', '/static/firebutton2.png');
     this.load.audio('battle', '/static/battle.mp3');
 		// this.load.json('shapes', '/static/shapes.json');
 	}

@@ -37,11 +37,22 @@ export default class ButtonWrapper extends Phaser.GameObjects.Container {
       this.buttonText.setOrigin(0.5, 0.5);
       this.add(this.buttonText);
     }
+
+    this.pressGesture = this.scene.tweens.create({
+      targets: this.background,
+      ease: 'Quad.easeInOut',
+      scaleX: 0.8 * this.background.scaleX,
+      scaleY: 0.8 * this.background.scaleY,
+      duration: 250,
+      yoyo: true,
+      onCallbackScope: this,
+    })
 		
 		this.scene.add.existing(this);
 	}
 
 	pressed() {
+    this.scene.tweens.makeActive(this.pressGesture);
 		emitter.emit(this.config.event);
 	}
 }

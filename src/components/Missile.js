@@ -39,6 +39,6 @@ export default class Missile {
 			y = posy;
 		}
 
-		this.scene.physics.moveTo(missile, x, y, 200);
+		this.scene.physics.moveTo(missile, x, y, 300);
 	}
 }
