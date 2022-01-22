@@ -1,4 +1,4 @@
-var CACHE_NAME = 'red-wings:t20';
+var CACHE_NAME = 'red-wings:t30';
 var initUrls = [
   '/static/battle.mp3',
   '/',
