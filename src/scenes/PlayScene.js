@@ -128,6 +128,10 @@ export default class PlayScene extends Phaser.Scene {
 
 		this.particles = this.add.particles('fire');
 
+    this.stationExplosionFireGroup = this.add.group({
+      defaultKey: 'fire',
+    });
+
 		this.cameras.main.setBounds(0, 0, this.background.displayWidth, this.background.displayHeight);
 
 		this.cameras.main.fadeIn(1000, 0, 0, 0);
@@ -224,12 +228,12 @@ export default class PlayScene extends Phaser.Scene {
 		this.enemyFightersGroup.clear(true, true);
 		this.enemyStationGroup.clear(true, true);
 		this.bulletGroup.clear(true, true);
-
-    if (this.stationExplosionFireGroup && this.stationExplosionFireGroup.children) {
-		  this.stationExplosionFireGroup.clear(true, true);
-    } else {
-      delete this.stationExplosionFireGroup;
-    }
+    this.stationExplosionFireGroup.clear(true, true);
+    // if (this.stationExplosionFireGroup && this.stationExplosionFireGroup.children) {
+		//   this.stationExplosionFireGroup.clear(true, true);
+    // } else {
+    //   delete this.stationExplosionFireGroup;
+    // }
 
 		this.explosionGroup.clear(true, true);
 	}
@@ -268,9 +272,9 @@ export default class PlayScene extends Phaser.Scene {
         this.enemyStation.fireEmitter.remove();
       }
 
-			this.stationExplosionFireGroup = this.add.group({
-				defaultKey: 'fire',
-			});
+			// this.stationExplosionFireGroup = this.add.group({
+			// 	defaultKey: 'fire',
+			// });
 
       this.stationExplosionFire = this.stationExplosionFireGroup.get(this.enemyStation.x, this.enemyStation.y);
       this.stationExplosionFire.setActive(true);

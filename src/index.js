@@ -1,28 +1,3 @@
-
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', async () => {
-    try {
-      await navigator.serviceWorker.register('../service-worker.js');
-    } catch (error) {
-      console.log('No service worker');
-    }
-  });
-}
-
-import * as Phaser from 'phaser';
-import PlayScene from './scenes/PlayScene';
-import LoadScene from './scenes/LoadScene';
-import EndScene from './scenes/EndScene';
-import PauseScene from './scenes/PauseScene';
-
-import { CONFIG_SIZE_SMALL_SCREEN, CONFIG_SIZE_LARGE_SCREEN } from './config';
-
-let isMobile = navigator.userAgent.indexOf('Mobile');
-
-if (isMobile === -1) {
-  isMobile = navigator.userAgent.indexOf('Tablet');
-}
-
 window.updateTemplateDOM = function(eventName) {
   switch(eventName) {
     case 'SHOW_GAME_AREA_LOADING':
@@ -48,6 +23,30 @@ window.updateTemplateDOM = function(eventName) {
       return;
   }
 };
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    try {
+      await navigator.serviceWorker.register('../service-worker.js');
+    } catch (error) {
+      console.log('No service worker');
+    }
+  });
+}
+
+import * as Phaser from 'phaser';
+import PlayScene from './scenes/PlayScene';
+import LoadScene from './scenes/LoadScene';
+import EndScene from './scenes/EndScene';
+import PauseScene from './scenes/PauseScene';
+
+import { CONFIG_SIZE_SMALL_SCREEN, CONFIG_SIZE_LARGE_SCREEN } from './config';
+
+let isMobile = navigator.userAgent.indexOf('Mobile');
+
+if (isMobile === -1) {
+  isMobile = navigator.userAgent.indexOf('Tablet');
+}
 
 updateTemplateDOM('SHOW_GAME_AREA_LOADING');
 

@@ -1,4 +1,4 @@
-var CACHE_NAME = 'red-wings:t15';
+var CACHE_NAME = 'red-wings:t20';
 var initUrls = [
   '/static/battle.mp3',
   '/',
@@ -27,6 +27,7 @@ var initUrls = [
 ];
 
 self.addEventListener('install', function (event) {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
