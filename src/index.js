@@ -76,6 +76,9 @@ const config = isMobile === -1 ? {
   },
   input: {
     activePointers: 3,
+  },
+  audio: {
+    disableWebAudio: true,
   }
 };
 

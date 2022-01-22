@@ -41,4 +41,8 @@ export default class Missile {
 
 		this.scene.physics.moveTo(missile, x, y, 300);
 	}
+
+  destroy() {
+    this.group.clear(true, true);
+  }
 }

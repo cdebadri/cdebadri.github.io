@@ -132,6 +132,8 @@ export default class PlayScene extends Phaser.Scene {
       defaultKey: 'fire',
     });
 
+    this.missile = null;
+
 		this.cameras.main.setBounds(0, 0, this.background.displayWidth, this.background.displayHeight);
 
 		this.cameras.main.fadeIn(1000, 0, 0, 0);
@@ -236,6 +238,7 @@ export default class PlayScene extends Phaser.Scene {
     // }
 
 		this.explosionGroup.clear(true, true);
+    this.missileGroup.destroy();
 	}
 
   // takingFire(object) {
