@@ -81,7 +81,7 @@ module.exports = {
         },
         './manifest.json',
         './index.css',
-        './service-worker.js',
+        './service-worker.js'
       ]
     }),
   ],
