@@ -83,6 +83,6 @@ const config = isMobile === -1 ? {
 };
 
 window.game = new Phaser.Game(config);
-window.emitter = new Phaser.Events.EventEmitter();
+// window.emitter = new Phaser.Events.EventEmitter();
 window.isMobile = isMobile !== -1;
 window.CONFIG_SIZE = window.isMobile ? CONFIG_SIZE_SMALL_SCREEN(config) : CONFIG_SIZE_LARGE_SCREEN(config);

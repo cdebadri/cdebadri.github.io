@@ -10,10 +10,14 @@ export default class Scorebox extends Phaser.GameObjects.Container {
 		this.add(this.text1);
 
 		this.scene.add.existing(this);
-		emitter.on('SCORE_UPDATED', this.scoreUpdated, this);
+		this.on('SCORE_UPDATED', this.scoreUpdated, this);
 	}
 
 	scoreUpdated() {
 		this.text1.setText(['SCORE', model.score]);
 	}
+
+  on(event, func, context) {
+    Phaser.GameObjects.Container.prototype.on.call(this, event, func, context);
+  }
 }

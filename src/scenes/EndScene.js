@@ -57,7 +57,7 @@ export default class EndScene extends Phaser.Scene {
 
     this.cameras.main.fadeIn(1000, 0, 0, 0);
 
-    emitter.on('RESTART_GAME', this.restartGame, this);
+    this.events.on('RESTART_GAME', this.restartGame, this);
     
     // this.grid.showNumbers();
   }

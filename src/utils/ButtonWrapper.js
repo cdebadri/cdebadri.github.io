@@ -53,6 +53,6 @@ export default class ButtonWrapper extends Phaser.GameObjects.Container {
 
 	pressed() {
     this.scene.tweens.makeActive(this.pressGesture);
-		emitter.emit(this.config.event);
+		this.scene.events.emit(this.config.event);
 	}
 }

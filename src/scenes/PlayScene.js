@@ -12,7 +12,7 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
   init() {
-		this.model = new Model();
+		this.model = new Model({ scene: this });
     this.media = new Media({ scene: this })
   }
 
@@ -21,7 +21,7 @@ export default class PlayScene extends Phaser.Scene {
       updateTemplateDOM('SHOW_MOBILE_INSTRUCTIONS');
     }
 
-    emitter.emit('PLAY_BACKGROUND_MUSIC', 'battle');
+    this.media.emit('PLAY_BACKGROUND_MUSIC', 'battle');
 
 		this.grid = new Grid({
 			scene: this,
@@ -29,8 +29,6 @@ export default class PlayScene extends Phaser.Scene {
 			cols: 15,
 			color: 'white',
 		});
-
-    // this.effects = new AnimationEffects({ scene: this });
 
 		// const shapes = this.cache.json.get('shapes');
 
@@ -141,11 +139,11 @@ export default class PlayScene extends Phaser.Scene {
 
 		this.setColliders();
 
-		emitter.on('SHIP_SHIELDS_CHANGE', this.changePlayerShieldValue, this);
-    emitter.on('ENEMY_SHIPS_SHIELDS_CHANGE', this.checkEnemyShields, this);
-    emitter.on('ENEMY_STATION_SHIELDS_CHANGE', this.checkEnemyStationShields, this);
-    emitter.on('SHOW_INFO', this.showInfo, this);
-    emitter.on('FIRE', this.makeBullets, this);
+		this.events.on('SHIP_SHIELDS_CHANGE', this.changePlayerShieldValue, this);
+    this.events.on('ENEMY_SHIPS_SHIELDS_CHANGE', this.checkEnemyShields, this);
+    this.events.on('ENEMY_STATION_SHIELDS_CHANGE', this.checkEnemyStationShields, this);
+    this.events.on('SHOW_INFO', this.showInfo, this);
+    this.events.on('FIRE', this.makeBullets, this);
     this.pauseGame();
 		this.setupClock();
     
@@ -295,7 +293,7 @@ export default class PlayScene extends Phaser.Scene {
         },
         onCompleteScope: this,
         onStart: function() {
-          emitter.emit('PLAY_SOUND', 'explosionSound');
+          this.media.emit('PLAY_SOUND', 'explosionSound');
           this.events.off('ENEMY_STATION_SHIELDS_CHANGE');
 					this.enemyStation.disableBody(true, true);
           this.enemyFightersGroup.children.each(function(child) {
@@ -334,7 +332,7 @@ export default class PlayScene extends Phaser.Scene {
     const enemyFighterShield = this.model.getEnemyShipShields(key); 
     
     if (enemyFighterShield === 0) {
-      emitter.emit('PLAY_SOUND', 'fightershot');
+      this.media.emit('PLAY_SOUND', 'fightershot');
       if (enemyFighter) {
         this.createExplosion(enemyFighter.x, enemyFighter.y);
       }
@@ -384,7 +382,7 @@ export default class PlayScene extends Phaser.Scene {
     }
 
     if (this.model.shipShields === 0) {
-      emitter.emit('PLAY_SOUND', 'fightershot');
+      this.media.emit('PLAY_SOUND', 'fightershot');
       this.createExplosion(this.ship.x, this.ship.y);
       if ('fireEmitter' in this.ship) {
         this.ship.fireEmitter.remove();
@@ -474,10 +472,10 @@ export default class PlayScene extends Phaser.Scene {
       )
     ) {
       this.model.enemyStationShields -= 10;
-      emitter.emit('PLAY_SOUND', 'explosionSound');
+      this.media.emit('PLAY_SOUND', 'explosionSound');
     } else {
       this.model.enemyStationShields -= 5;
-      emitter.emit('PLAY_SOUND', 'fightershot');
+      this.media.emit('PLAY_SOUND', 'fightershot');
     }
 		
 		this.createExplosion(bullet.x, bullet.y);
@@ -485,7 +483,7 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
 	enemyDestroysShip(ship, bullet) {
-    emitter.emit('PLAY_SOUND', 'fightershot');
+    this.media.emit('PLAY_SOUND', 'fightershot');
     this.createExplosion(ship.x, ship.y);
 		bullet.disableBody(true, true);
 		this.cameras.main.shake(200);
@@ -513,20 +511,20 @@ export default class PlayScene extends Phaser.Scene {
 
 	rockDestroyShip(ship, rock) {
 		rock.disableBody(true, true);
-    emitter.emit('PLAY_SOUND', 'fightershot');
+    this.media.emit('PLAY_SOUND', 'fightershot');
     this.createExplosion(ship.x, ship.y);
     this.model.shipShields -= 1;
 	}
 
 	destroyRocks(bullet, rock) {
-    emitter.emit('PLAY_SOUND', 'fightershot')
+    this.media.emit('PLAY_SOUND', 'fightershot')
     this.createExplosion(rock.x, rock.y);
 		rock.disableBody(true, true);
 		bullet.disableBody(true, true);
   }
 
 	destroyRocksEnemy(bullet, rock) {
-    emitter.emit('PLAY_SOUND', 'fightershot');
+    this.media.emit('PLAY_SOUND', 'fightershot');
     this.createExplosion(rock.x, rock.y);
 		rock.disableBody(true, true);
 		bullet.disableBody(true, true);
@@ -556,7 +554,7 @@ export default class PlayScene extends Phaser.Scene {
 		}
 
 		this.lastBullet = this.getTimer();
-    emitter.emit('PLAY_SOUND', 'gunshot');
+    this.media.emit('PLAY_SOUND', 'gunshot');
 
 		const bullet = this.bulletGroup.get(this.ship.x, this.ship.y);
 		bullet.enableBody(true, this.ship.x, this.ship.y, true, true);
@@ -636,7 +634,7 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
 	shipDestroysEnemy(ship, bullet) {
-    emitter.emit('PLAY_SOUND', 'fightershot');
+    this.media.emit('PLAY_SOUND', 'fightershot');
     this.createExplosion(bullet.x, bullet.y)
 		bullet.disableBody(true, true);
     // debugger;
@@ -782,7 +780,7 @@ export default class PlayScene extends Phaser.Scene {
 			this.missileRecalibrationTime = new Date().getTime();
 			this.physics.add.collider(this.missile, this.ship, this.missileDestroysShip, null, this);
 			this.physics.add.collider(this.missile, this.rockGroup, this.rocksDestroyMissile, null, this);
-      emitter.emit('PLAY_SOUND', 'gunshot');
+      this.media.emit('PLAY_SOUND', 'gunshot');
 		}
 	}
 

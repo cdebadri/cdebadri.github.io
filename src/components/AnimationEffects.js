@@ -1,14 +1,15 @@
 import * as Phaser from 'phaser';
 // import { Align } from '../utils';
 
-export default class AnimationEffects {
+export default class AnimationEffects extends Phaser.GameObjects.GameObject {
 	constructor(config) {
+    super();
     this.scene = config.scene;
     this.tweenManager = new Phaser.Tweens.TweenManager(config.scene);
 	}
 
   destroyEnemyStation() {
-    emitter.emit('ENEMY_STATION_DESTROYED');
+    this.events.emit('ENEMY_STATION_DESTROYED');
   }
 
   enemyStationDestruction({ targets }) {

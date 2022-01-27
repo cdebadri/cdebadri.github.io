@@ -27,9 +27,8 @@ export default class ToggleButtonWrapper extends Phaser.GameObjects.Container {
 	}
 
 	pressed() {
-		emitter.emit(this.event);
+		this.scene.events.emit(this.event);
 		this.iconTrue.visible = !this.iconTrue.visible;
 		this.iconFalse.visible = !this.iconFalse.visible;
-		
 	}
 }

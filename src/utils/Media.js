@@ -1,20 +1,23 @@
-export default class Media {
+import { GameObjects } from 'phaser';
+
+export default class Media extends GameObjects.GameObject  {
 	constructor(config) {
+    super(config.scene);
 		this.scene = config.scene;
     this._soundOn = true;
     this._musicOn = true;
 		if (!this.soundGroup) {
 			this.soundGroup = {};
 		}
-		emitter.on('PLAY_SOUND', this.playSound, this);
-		emitter.on('PLAY_BACKGROUND_MUSIC', this.playBackground, this);
-		emitter.on('SOUND_SETTINGS_CHANGED', this.updateSettings, this);
-    emitter.on('MUSIC_SETTINGS_CHANGED', this.updateSettings, this);
+		this.on('PLAY_SOUND', this.playSound, this);
+		this.on('PLAY_BACKGROUND_MUSIC', this.playBackground, this);
+		this.on('SOUND_SETTINGS_CHANGED', this.updateSettings, this);
+    this.on('MUSIC_SETTINGS_CHANGED', this.updateSettings, this);
 	}
 
   set soundOn(flag) {
     this._soundOn = flag;
-    emitter.emit('SOUND_SETTINGS_CHANGED');
+    this.emit('SOUND_SETTINGS_CHANGED');
   }
 
   get soundOn() {
@@ -23,7 +26,7 @@ export default class Media {
 
   set musicOn(flag) {
     this._musicOn = flag;
-    emitter.emit('MUSIC_SETTINGS_CHANGED');
+    this.emit('MUSIC_SETTINGS_CHANGED');
   }
 
   get musicOn() {
@@ -57,4 +60,12 @@ export default class Media {
 			this.soundGroup[key].play();
 		}
 	}
+
+  on(event, func, context) {
+    GameObjects.GameObject.prototype.on.call(this, event, func, context);
+  }
+
+  emit(event, audioKey) {
+    GameObjects.GameObject.prototype.emit.call(this, event, audioKey);
+  }
 }

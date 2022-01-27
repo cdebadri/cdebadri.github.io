@@ -19,7 +19,7 @@ export default class PauseScene extends Phaser.Scene {
       // this.playButton.setInteractive();
     }
 
-    emitter.on('PLAY_SCENE', function () {
+    this.events.on('PLAY_SCENE', function () {
       this.scene.bringToTop('PlayScene');
       this.scene.resume(this.sceneKey);
       this.scene.stop();
