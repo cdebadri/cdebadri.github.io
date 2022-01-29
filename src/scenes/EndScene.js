@@ -10,6 +10,7 @@ export default class EndScene extends Phaser.Scene {
 
   init(data) {
     this.gameOver = data.gameOver;
+    this.prevScene = data.sceneKey;
   }
 
   create() {
@@ -70,7 +71,10 @@ export default class EndScene extends Phaser.Scene {
 
   restartGame() {
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function() {
-			this.scene.start('PlayScene');
+      this.events.emit('RESET');
+			this.scene.wake(this.prevScene);
+      this.scene.bringToTop(this.prevScene);
+      this.scene.sleep('EndScene');
 		}, this);
 		this.cameras.main.fadeOut(2000, 0, 0, 0);
   }

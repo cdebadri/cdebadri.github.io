@@ -22,7 +22,7 @@ export default class PauseScene extends Phaser.Scene {
     this.events.on('PLAY_SCENE', function () {
       this.scene.bringToTop('PlayScene');
       this.scene.resume(this.sceneKey);
-      this.scene.stop();
+      this.scene.sleep('PauseScene');
     }, this);
 
     this.scene.bringToTop(this);

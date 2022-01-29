@@ -14,6 +14,8 @@ export default class Model extends GameObjects.GameObject {
 	  this._enemyStationShields = 100;
 	  this._gameOver = false;
     this.scene = props.scene;
+
+    this.on('RESET', this.resetConfigs, this);
 	}
 
 	set gameOver(val) {
@@ -53,5 +55,21 @@ export default class Model extends GameObjects.GameObject {
 
   on(event, func, context) {
     GameObjects.GameObject.prototype.on.call(this, event, func, context);
+  }
+
+  emit(event) {
+    GameObjects.GameObject.prototype.emit.call(this, event);
+  }
+
+  resetConfigs() {
+    this._shipShields = 100;
+	  this._enemyShipShields = {
+	  	'fighter-1': 100,
+	  	'fighter-2': 100,
+	  	'fighter-3': 100,
+	  	'fighter-4': 100,
+	  };
+	  this._enemyStationShields = 100;
+	  this._gameOver = false;
   }
 }

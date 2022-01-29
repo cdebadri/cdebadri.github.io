@@ -13,7 +13,7 @@ export default class PlayScene extends Phaser.Scene {
 
   init() {
 		this.model = new Model({ scene: this });
-    this.media = new Media({ scene: this })
+    this.media = new Media({ scene: this });
   }
 
 	create() {
@@ -144,14 +144,25 @@ export default class PlayScene extends Phaser.Scene {
     this.events.on('ENEMY_STATION_SHIELDS_CHANGE', this.checkEnemyStationShields, this);
     this.events.on('SHOW_INFO', this.showInfo, this);
     this.events.on('FIRE', this.makeBullets, this);
+    this.events.on('RESET', function () {
+      this.model.emit('RESET');
+    }, this);
     this.pauseGame();
 		this.setupClock();
     
 		// this.grid.showNumbers();
 	}
 
+  gameInit() {
+    
+  }
+
   pauseGame() {
-    this.scene.launch('PauseScene', { sceneKey: 'PlayScene' });
+    if (this.scene.isSleeping('PauseScene')) {
+      this.scene.wake('PauseScene', { sceneKey: 'PlayScene' });
+    } else {
+      this.scene.launch('PauseScene', { sceneKey: 'PlayScene' });
+    }
     this.scene.pause('PlayScene');
   }
 
@@ -258,8 +269,13 @@ export default class PlayScene extends Phaser.Scene {
 
 	transition() {
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function() {
-      this.destroyObjects();
-			this.scene.start('EndScene', { gameOver: this.model.gameOver });
+      // this.destroyObjects();
+      if (this.scene.isSleeping('EndScene')) {
+			  this.scene.wake('EndScene', { gameOver: this.model.gameOver, sceneKey: 'PlayScene' });
+      } else {
+        this.scene.launch('EndScene', { gameOver: this.model.gameOver, sceneKey: 'PlayScene' });
+      }
+      this.scene.sleep('PlayScene');
 		}, this);
 		this.cameras.main.fadeOut(2000, 0, 0, 0);
 	}
