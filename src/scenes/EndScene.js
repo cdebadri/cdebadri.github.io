@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { Grid, Text, ButtonWrapper } from '../utils';
+import { EventsCenter } from '../components';
 
 export default class EndScene extends Phaser.Scene {
   constructor() {
@@ -59,21 +60,23 @@ export default class EndScene extends Phaser.Scene {
     this.cameras.main.fadeIn(1000, 0, 0, 0);
 
     this.events.on('RESTART_GAME', this.restartGame, this);
+    EventsCenter.on('RENDER_END_SCENE', this.reset, this);
     
     // this.grid.showNumbers();
   }
 
-  destroyObjects() {
-    this.background.destroy();
-    this.button.destroy();
-    this.message.destroy();
+  reset(data) {
+    this.init(data)
+    this.message.setText(this.gameOver ? lang.endScene.defeatMessage : lang.endScene.victoryMessage);
+    this.message.x = CONFIG_SIZE.GAME_WIDTH / 2 - this.message.width / 2;
+    this.cameras.main.fadeIn(1000, 0, 0, 0);
   }
 
   restartGame() {
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, function() {
-      this.events.emit('RESET');
 			this.scene.wake(this.prevScene);
       this.scene.bringToTop(this.prevScene);
+      EventsCenter.emit('RESET');
       this.scene.sleep('EndScene');
 		}, this);
 		this.cameras.main.fadeOut(2000, 0, 0, 0);

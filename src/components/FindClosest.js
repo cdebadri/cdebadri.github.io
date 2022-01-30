@@ -5,13 +5,13 @@ export default function(group, object) {
 	let closestChild;
 	let distance;
 
-	group.children.iterate(function(child) {
+	group.getMatching('active', true).forEach(function(child) {
 		distance = Phaser.Math.Distance.Between(child.x, child.y, object.x, object.y);
 		if (minDistance > distance) {
 			minDistance = distance;
 			closestChild = child;
 		}
-	});
+	}, this);
 	
 	return closestChild;
 }
