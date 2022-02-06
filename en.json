@@ -22,7 +22,7 @@
   "footer": "A Debadri Chowdhury Creation",
   "update": {
     "text": "An update is available",
-    "button": "UPDATE"
+    "button": "Update Now"
   },
   "staticFiles": [
     "/static/battle.mp3",

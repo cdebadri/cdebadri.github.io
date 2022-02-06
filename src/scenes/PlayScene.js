@@ -27,8 +27,6 @@ export default class PlayScene extends Phaser.Scene {
 			color: 'white',
 		});
 
-		// const shapes = this.cache.json.get('shapes');
-
 		this.background = this.add.image(0, 0, 'background');
 		this.background.setOrigin(
 			0, 
@@ -46,8 +44,6 @@ export default class PlayScene extends Phaser.Scene {
 			defaultKey: 'player',
 			scene: this,
 		});
-
-		// this.isEnemyAvailable = false;
 
 		this.bulletGroup = this.physics.add.group({
 			defaultKey: 'bullet',
@@ -193,8 +189,6 @@ export default class PlayScene extends Phaser.Scene {
 		this.cameras.main.fadeIn(1000, 0, 0, 0);
 		this.cameras.main.startFollow(this.ship, true);
 
-    // this.setColliders();
-
     this.setupTimer();
   }
 
@@ -219,8 +213,6 @@ export default class PlayScene extends Phaser.Scene {
       event: 'SHOW_INFO',
       scaleFactor: CONFIG_SIZE.MESSAGE_ICON_BUTTON_SIZE,
     });
-    // this.infoButton.setDepth(2);
-    // this.infoButton.setScrollFactor(0);
     this.grid.placeAt(CONFIG_SIZE.MESSAGE_ICON_PLACE, this.infoButton, 'corner');
   }
 
@@ -256,25 +248,12 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
   destroyEnemyStation() {
-    // this.events.off('ENEMY_STATION_DESTROYED');
     this.stationExplosionFire.setActive(false);
     this.stationExplosionFire.setVisible(false);
 		this.transition();
   }
 
 	destroyObjects() {
-    // if (this.enemyBulletGroup) {
-    //   this.enemyBulletGroup.destroy(this.enemyBulletGroup.getLength() > 0);
-    // }
-    // if (this.enemyFightersGroup) {
-    //   this.enemyFightersGroup.destroy(this.enemyFightersGroup.getLength() > 0);
-    // }
-    // if (this.bulletGroup) {
-  	// 	this.bulletGroup.destroy(this.bulletGroup.getLength() > 0);
-    // }
-    // if (this.rockGroup) {
-  	// 	this.rockGroup.destroy(this.rockGroup.getLength() > 0);
-    // }
     if ('fireEmitter' in this.ship) {
       this.ship.removeFire();
     }
@@ -346,24 +325,15 @@ export default class PlayScene extends Phaser.Scene {
       if (this.enemyStation && 'fireEmitter' in this.enemyStation) {
         this.enemyStation.removeFire();
       }
-
-			// this.stationExplosionFireGroup = this.add.group({
-			// 	defaultKey: 'fire',
-			// });
-
       this.stationExplosionFire = this.stationExplosionFireGroup.get(this.enemyStation.x, this.enemyStation.y);
       this.stationExplosionFire.setActive(true);
       this.stationExplosionFire.setVisible(true);
-      // this.effects.enemyStationDestruction({ targets: this.stationExplosionFire });
-      // this.enemyStation.destroy();
       if (!('explode' in this.enemyStation)) {
         const vanish = this.tweens.create({
           targets: this.stationExplosionFire,
           alpha: 0,
           ease: 'Sine.easeInOut',
           onComplete: function() {
-            // emitter.emit('ENEMY_STATION_DESTROYED');
-            // this.tweens.killTweensOf(this.stationExplosionFire);
             this.destroyEnemyStation();
           },
           onCompleteScope: this,
@@ -400,12 +370,7 @@ export default class PlayScene extends Phaser.Scene {
     }
   }
 
-	// destroyAllEnemyFighters() {
-
-	// }
-
   checkEnemyShields(key) {
-    // debugger;
     const enemyFighter = this.enemyFightersGroup.getChildren().find(child => child.name === key);
     const enemyFighterShield = this.model.getEnemyShipShields(key); 
     
@@ -419,8 +384,6 @@ export default class PlayScene extends Phaser.Scene {
         if ('fireEmitter' in enemyFighter) {
           enemyFighter.removeFire();
         }
-        // emitter.emit(`ENEMY_DESTROYED_${enemyFighter.name}`);
-        // this.events.off('ENEMY_SHIPS_SHIELDS_CHANGE');
 				enemyFighter.disableBody(true, true);
       }
     } else if (enemyFighterShield < 50 && !enemyFighter.hasLowHealth) {
@@ -516,7 +479,7 @@ export default class PlayScene extends Phaser.Scene {
       event: 'FIRE',
     });
 		this.fireButton.setScrollFactor(0);
-		this.grid.placeAt(121, this.fireButton);
+		this.grid.placeAt(CONFIG_SIZE.FIRE_BUTTON_POSITION, this.fireButton);
 	}
 
 	createJoystick() {
@@ -540,7 +503,7 @@ export default class PlayScene extends Phaser.Scene {
 			)
 		});
 		this.joystick.on('update', this.onJoystickUpdate, this);
-		this.grid.placeAt(133, this.joystick);
+		this.grid.placeAt(CONFIG_SIZE.JOYSTICK_POSITION, this.joystick);
 	}
 
 	setColliders() {
@@ -642,9 +605,8 @@ export default class PlayScene extends Phaser.Scene {
 
 	setShipConfigurations() {
 		this.ship.angle = -90;
-		this.ship.topSpeed = 150;
+		this.ship.topSpeed = 200;
     this.ship.hasLowHealth = false;
-    // this.takingFire(this.ship);
 	}
 
 	makeBullets() {
@@ -746,12 +708,10 @@ export default class PlayScene extends Phaser.Scene {
     this.media.emit('PLAY_SOUND', 'fightershot');
     this.createExplosion(bullet.x, bullet.y)
 		bullet.disableBody(true, true);
-    // debugger;
 		this.model.enemyShipShields = {
 			key: ship.name,
 			shield: this.model.getEnemyShipShields(ship.name) - 5,
 		}
-    // debugger;
 	}
 
 	getTimer() {
@@ -780,11 +740,6 @@ export default class PlayScene extends Phaser.Scene {
 	moveEnemy(fighter) {
 		const rad = Phaser.Math.Angle.Between(fighter.x, fighter.y, this.ship.x, this.ship.y);
 		fighter.angle = Align.toDegrees(rad);
-
-		// if (this.pursuingFighter && this.pursuingFighter.name !== fighter.name) {
-		// 	console.log(this.pursuingFighter);
-		// 	this.retracePosition(this.pursuingFighter);
-		// }
 		this.enemyFightersGroup.emit('retracePosition');
 		if (
 			Align.detectProximity(fighter, this.ship, fighter.flyRange) && !this.model.gameOver

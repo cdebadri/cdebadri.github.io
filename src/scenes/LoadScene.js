@@ -63,7 +63,6 @@ export default class LoadScene extends Phaser.Scene {
     this.load.image('info', '/static/info2.png');
     this.load.image('firebutton', '/static/firebutton2.png');
     this.load.audio('battle', '/static/battle.mp3');
-		// this.load.json('shapes', '/static/shapes.json');
 	}
 
 	onProgress(value) {

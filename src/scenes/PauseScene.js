@@ -17,7 +17,6 @@ export default class PauseScene extends Phaser.Scene {
     if (!isMobile) {
       this.playButton = this.add.image(game.config.width / 2, game.config.height / 2, 'play');
       Align.scaleToGameW(this.playButton, CONFIG_SIZE.PLAY_BUTTON_SIZE);
-      // this.playButton.setInteractive();
     }
 
     EventsCenter.on('PLAY_SCENE', function () {
