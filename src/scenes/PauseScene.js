@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { EventsCenter } from '../components';
 import { Align } from '../utils';
 
 export default class PauseScene extends Phaser.Scene {
@@ -19,10 +20,10 @@ export default class PauseScene extends Phaser.Scene {
       // this.playButton.setInteractive();
     }
 
-    this.events.on('PLAY_SCENE', function () {
+    EventsCenter.on('PLAY_SCENE', function () {
       this.scene.bringToTop('PlayScene');
       this.scene.resume(this.sceneKey);
-      this.scene.sleep('PauseScene');
+      this.scene.stop();
     }, this);
 
     this.scene.bringToTop(this);

@@ -6,10 +6,12 @@ const handlebars = require('handlebars');
 const lang = require('./en');
 const modal = require('./views/modal.handlebars');
 const story = require('./views/story.handlebars');
+const updateBanner = require('./views/updateBanner.handlebars');
 
 handlebars.registerPartial({
   story,
   modal,
+  updateBanner,
 });
 
 module.exports = {
@@ -50,6 +52,12 @@ module.exports = {
         use: [
           {
             loader: 'handlebars-loader',
+            options: {
+              helperDirs: path.join(__dirname, 'helpers'),
+              precompileOptions: {
+                knownHelpersOnly: false,
+              },
+            },
           },
         ],
       },

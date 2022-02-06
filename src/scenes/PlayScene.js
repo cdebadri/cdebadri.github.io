@@ -2,7 +2,6 @@ import * as Phaser from 'phaser';
 import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick';
 import { Grid, Align, Model, Bar, Media, Text, ButtonWrapper } from '../utils';
 import { FindClosest, Missile, CleanupGroup, EventsCenter } from '../components';
-// import CleanupGroup from '../components/CleanupGroup';
 
 export default class PlayScene extends Phaser.Scene {
 	constructor() {
@@ -310,33 +309,9 @@ export default class PlayScene extends Phaser.Scene {
         }, this);
       }
     }, this);
+    this.missile = null;
     this.time.removeAllEvents();
-		// this.shipGroup.clear(true, true);
-		// this.enemyBulletGroup.clear(true, true);
-		// this.rockGroup.clear(true, true);
-		// this.enemyFightersGroup.clear(true, true);
-		// this.enemyStationGroup.clear(true, true);
-		// this.bulletGroup.clear(true, true);
-    // this.stationExplosionFireGroup.clear(true, true);
-    // if (this.stationExplosionFireGroup && this.stationExplosionFireGroup.children) {
-		//   this.stationExplosionFireGroup.clear(true, true);
-    // } else {
-    //   delete this.stationExplosionFireGroup;
-    // }
-
-		// this.explosionGroup.clear(true, true);
-    // this.missileGroup.destroy();
 	}
-
-  // takingFire(object) {
-  //   object.shotTween = this.tweens.create({
-  //     targets: object,
-  //     // angle: {from: object.angle, to:object.angle + 5},
-  //     ease: 'Bounce.easeInOut',
-  //     duration: 500,
-  //     yoyo: true,
-  //   })
-  // }
 
   createExplosion(x, y) {
 		const explosion = this.explosionGroup.get(x, y, undefined, undefined, true);

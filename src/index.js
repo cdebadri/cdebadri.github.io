@@ -1,4 +1,13 @@
-window.updateTemplateDOM = function(eventName) {
+
+import * as Phaser from 'phaser';
+import PlayScene from './scenes/PlayScene';
+import LoadScene from './scenes/LoadScene';
+import EndScene from './scenes/EndScene';
+import PauseScene from './scenes/PauseScene';
+import { CONFIG_SIZE_SMALL_SCREEN, CONFIG_SIZE_LARGE_SCREEN } from './config';
+import { EventsCenter } from './components';
+
+window.updateTemplateDOM = function(eventName, params) {
   switch(eventName) {
     case 'SHOW_GAME_AREA_LOADING':
       const container = document.getElementById('container');
@@ -19,7 +28,15 @@ window.updateTemplateDOM = function(eventName) {
       return;
     case 'HIDE_MOBILE_INSTRUCTIONS':
       document.getElementById('mobile_instructions').style.display = 'none';
-      emitter.emit('PLAY_SCENE');
+      EventsCenter.emit('PLAY_SCENE');
+      return;
+    case 'SHOW_UPDATE':
+      document.getElementById('update-banner').style.display = 'flex';
+      document.getElementById('update-button').onclick = () => updateTemplateDOM('UPDATE_NOW', { reg: params.reg });
+      return;
+    case 'UPDATE_NOW':
+      params.reg.waiting.postMessage('SKIP_WAITING');
+      document.getElementById('update-banner').style.display = 'none';
       return;
   }
 };
@@ -27,20 +44,25 @@ window.updateTemplateDOM = function(eventName) {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async () => {
     try {
-      await navigator.serviceWorker.register('../service-worker.js');
+      const reg = await navigator.serviceWorker.register('../service-worker.js');
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (reg.waiting) {
+            if (navigator.serviceWorker.controller) {
+              updateTemplateDOM('SHOW_UPDATE', { reg });
+            }
+          }
+        });
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        // window.location.reload();
+      });
     } catch (error) {
       console.log('No service worker');
     }
   });
 }
-
-import * as Phaser from 'phaser';
-import PlayScene from './scenes/PlayScene';
-import LoadScene from './scenes/LoadScene';
-import EndScene from './scenes/EndScene';
-import PauseScene from './scenes/PauseScene';
-
-import { CONFIG_SIZE_SMALL_SCREEN, CONFIG_SIZE_LARGE_SCREEN } from './config';
 
 let isMobile = navigator.userAgent.indexOf('Mobile');
 

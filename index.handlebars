@@ -17,8 +17,20 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png" />
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
-    <link rel="preload" as="font" href="/static/Thectro.ttf" type="font/ttf" crossorigin="anonymous">
+    {{!-- <link rel="preload" as="font" href="/static/Thectro.ttf" type="font/ttf" crossorigin="anonymous">
     <link rel="preload" as="font" href="/static/Digital.ttf" type="font/ttf" crossorigin="anonymous">
+    <link rel="preload" as="audio" href="/static/battle.mp3">
+    <link rel="preload" as="audio" href="/static/gunshot.mp3">
+    <link rel="preload" as="audio" href="/static/explosion.mp3">
+    <link rel="preload" as="audio" href="/static/fightershot.mp3">
+    <link rel="preload" as="image" href="/static/background.mp3">
+    <link rel="preload" as="image" href="/static/bullet.mp3">
+    <link rel="preload" as="image" href="/static/button.mp3">
+    <link rel="preload" as="image" href="/static/ebullet.mp3">
+    <link rel="preload" as="image" href="/static/enemystation2.mp3"> --}}
+    {{#each staticFiles}}
+    <link rel="preload" as="{{ types this }}" href="{{ this }}" crossorigin="anonymous">
+    {{/each}}
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="/index.css">
   </head>
@@ -34,6 +46,7 @@
         <div class="text">{{ instructions.body }}</div>
       </div>
     </div>
+    {{> views/updateBanner }}
     <footer class="footer">
       <div>&copy;	{{ footer }} &copy;</div>
     </footer>

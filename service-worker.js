@@ -1,7 +1,7 @@
 
 var initUrls = [
-  '/index.html',
   '/static/battle.mp3',
+  '/index.html',
   '/',
   '/main.js',
   '/index.css',
@@ -27,11 +27,21 @@ var initUrls = [
   '/static/Digital.ttf',
 ];
 
+self.addEventListener('message', function (event) {
+  switch (event.data) {
+    case 'SKIP_WAITING':
+      event.waitUntil(
+        self.skipWaiting()
+      );
+      break;
+  };
+});
+
 self.addEventListener('install', function (event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(function(cache) {
-        return cache.addAll(initUrls);
+      .then(async function(cache) {
+        await cache.addAll(initUrls)
       })
       .catch(function(error) {
         console.log(`There are install issues - ${JSON.stringify(error)}`);
@@ -53,10 +63,10 @@ self.addEventListener('fetch', function (event) {
               return response;
             }
 
-            var responseToCache = response.clone();
-            caches.open(CACHE_NAME)
+            return caches.open(CACHE_NAME)
               .then(function (cache) {
-                cache.put(event.request, responseToCache);
+                cache.put(event.request, response.clone());
+                return response;
               })
               .catch(function (error) {
                 console.log(`Error on cache opening - ${JSON.stringify(error)}`);
@@ -86,4 +96,4 @@ self.addEventListener('activate', function (event) {
       })
   );
 });
-var CACHE_NAME = 'red-wings:1642921109719';
+var CACHE_NAME = 'red-wings:1644126522316';
