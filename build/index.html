@@ -10,15 +10,33 @@
     <title>Red Wings</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="shortcut icon" href="/static/favicon.ico" />
-    <link rel="icon" sizes="32x32" href="/static/favicon-32x32.png" />
-    <link rel="icon" sizes="192x192" href="/static/android-chrome-192x192.png" />
-    <link rel="icon" sizes="512x512" href="/static/android-chrome-512x512.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png" />
+    <link rel="shortcut icon" href="static/favicon.ico" />
+    <link rel="icon" sizes="32x32" href="static/favicon-32x32.png" />
+    <link rel="icon" sizes="192x192" href="static/android-chrome-192x192.png" />
+    <link rel="icon" sizes="512x512" href="static/android-chrome-512x512.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png" />
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
-    <link rel="preload" as="font" href="/static/Thectro.ttf" type="font/ttf" crossorigin="anonymous">
-    <link rel="preload" as="font" href="/static/Digital.ttf" type="font/ttf" crossorigin="anonymous">
+    <link rel="preload" as="audio" href="static/battle.mp3" crossorigin="anonymous">
+    <link rel="preload" as="font" href="static/Thectro.ttf" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/background.jpg" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/bullet.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/ebullet.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/player2.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/eship2.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/exp.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/muzzleflash3.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/rocks.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/button.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/enemystation2.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/missile.png" crossorigin="anonymous">
+    <link rel="preload" as="audio" href="static/gunshot.mp3" crossorigin="anonymous">
+    <link rel="preload" as="audio" href="static/explosion.mp3" crossorigin="anonymous">
+    <link rel="preload" as="audio" href="static/fightershot.mp3" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/play.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/info2.png" crossorigin="anonymous">
+    <link rel="preload" as="image" href="static/firebutton2.png" crossorigin="anonymous">
+    <link rel="preload" as="font" href="static/Digital.ttf" crossorigin="anonymous">
     <link rel="manifest" href="/manifest.json">
     <link rel="stylesheet" href="/index.css">
   <script defer src="/main.js"></script></head>
@@ -45,7 +63,10 @@
         <div class="text">Press the ARROW keys to move the fighter and S to fire bullets. The game can be paused/restarted with SPACE.</div>
       </div>
     </div>
-    <footer class="footer">
+    <div id="update-banner">
+      <div>An update is available</div>
+      <button id="update-button">Update Now</button>
+    </div>    <footer class="footer">
       <div>&copy;	A Debadri Chowdhury Creation &copy;</div>
     </footer>
     <!-- Scripts will be injected automatically -->
