@@ -9,7 +9,7 @@ export default class Model extends GameObjects.GameObject {
 	  	'fighter-1': 100,
 	  	'fighter-2': 100,
 	  	'fighter-3': 100,
-	  	'fighter-4': 100,
+      'fighter-4': 100,
 	  };
 	  this._enemyStationShields = 100;
 	  this._gameOver = false;
@@ -67,7 +67,7 @@ export default class Model extends GameObjects.GameObject {
 	  	'fighter-1': 100,
 	  	'fighter-2': 100,
 	  	'fighter-3': 100,
-	  	'fighter-4': 100,
+      'fighter-4': 100,
 	  };
 	  this._enemyStationShields = 100;
 	  this._gameOver = false;

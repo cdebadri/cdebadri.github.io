@@ -650,29 +650,13 @@ export default class PlayScene extends Phaser.Scene {
 		const rad = this.enemyStation.range;
 		for (let i = 0; i < this.enemyStation.assistGroup; i++) {
 			const angle = Phaser.Math.RND.angle();
-			this.enemyStation.assistPositions.push({
-				x: rad * Math.cos(Align.toRadians(angle)) + this.enemyStation.x,
-				y: rad * Math.sin(Align.toRadians(angle)) + this.enemyStation.y,
-				angle,
-			});
-
-			this.enemyStation.assistPositions.push({
-				x: rad * Math.cos(Align.toRadians(angle + 90)) + this.enemyStation.x,
-				y: rad * Math.sin(Align.toRadians(angle + 90)) + this.enemyStation.y,
-				angle: angle + 90,
-			});
-
-			this.enemyStation.assistPositions.push({
-				x: rad * Math.cos(Align.toRadians(angle + 180)) + this.enemyStation.x,
-				y: rad * Math.sin(Align.toRadians(angle + 180)) + this.enemyStation.y,
-				angle: angle + 180,
-			});
-
-			this.enemyStation.assistPositions.push({
-				x: rad * Math.cos(Align.toRadians(angle + 270)) + this.enemyStation.x,
-				y: rad * Math.sin(Align.toRadians(angle + 270)) + this.enemyStation.y,
-				angle: angle + 270,
-			});
+      CONFIG_SIZE.ENEMY_FIGHTER_POSITIONS.forEach(angle => {
+        this.enemyStation.assistPositions.push({
+          x: rad * Math.cos(Align.toRadians(angle)) + this.enemyStation.x,
+          y: rad * Math.sin(Align.toRadians(angle)) + this.enemyStation.y,
+          angle,
+        });
+      }, this);
 		}
 	}
 
