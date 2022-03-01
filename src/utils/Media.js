@@ -55,7 +55,7 @@ export default class Media extends GameObjects.GameObject  {
 	playBackground(key) {
 		if (this.musicOn) {
       if (!this.soundGroup[key]) {
-  			this.soundGroup[key] = this.scene.sound.add(key, { loop: true, volume: 0.25 });
+  			this.soundGroup[key] = this.scene.sound.add(key, { loop: true });
       }
 			this.soundGroup[key].play();
 		}
