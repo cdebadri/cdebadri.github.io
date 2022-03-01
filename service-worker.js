@@ -98,4 +98,4 @@ self.addEventListener('activate', function (event) {
       })
   );
 });
-var CACHE_NAME = 'red-wings:1646137003349';
+var CACHE_NAME = 'red-wings:1646145783015';
