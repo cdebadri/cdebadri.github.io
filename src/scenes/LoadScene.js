@@ -54,7 +54,7 @@ export default class LoadScene extends Phaser.Scene {
 			endFrame: 3,
 		});	
 		this.load.image('button', '/static/button.png');
-		this.load.image('enemyStation', '/static/enemystation2.png');
+		this.load.image('enemyStation', '/static/enemystation3.png');
 		this.load.image('missile', '/static/missile.png');
     this.load.audio('gunshot', '/static/gunshot.mp3');
     this.load.audio('explosionSound', '/static/explosion.mp3');
@@ -63,6 +63,8 @@ export default class LoadScene extends Phaser.Scene {
     this.load.image('info', '/static/info2.png');
     this.load.image('firebutton', '/static/firebutton2.png');
     this.load.audio('battle', '/static/battle.mp3');
+    this.load.image('playerMissile', '/static/playermissile.png');
+    this.load.image('missilebutton', '/static/missilebutton.png');
 	}
 
 	onProgress(value) {

@@ -16,7 +16,7 @@ var initUrls = [
   '/static/muzzleflash3.png',
   '/static/rocks.png',
   '/static/button.png',
-  '/static/enemystation2.png',
+  '/static/enemystation3.png',
   '/static/missile.png',
   '/static/gunshot.mp3',
   '/static/explosion.mp3',
@@ -25,6 +25,8 @@ var initUrls = [
   '/static/info2.png',
   '/static/firebutton2.png',
   '/static/Digital.ttf',
+  '/static/playermissile.png',
+  '/static/missilebutton.png',
 ];
 
 self.addEventListener('message', function (event) {

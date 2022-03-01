@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 import VirtualJoystick from 'phaser3-rex-plugins/plugins/virtualjoystick';
 import { Grid, Align, Model, Bar, Media, Text, ButtonWrapper } from '../utils';
-import { FindClosest, Missile, CleanupGroup, EventsCenter } from '../components';
+import { FindClosest, Missile, CleanupGroup, EventsCenter, PlayerMissile } from '../components';
 
 export default class PlayScene extends Phaser.Scene {
 	constructor() {
@@ -38,6 +38,7 @@ export default class PlayScene extends Phaser.Scene {
 			this.createJoystick();
 			this.createFireButton();
       this.messageIconForMobile();
+      this.createMissileButton();
 		}
 
 		this.shipGroup = this.physics.add.group({
@@ -99,6 +100,12 @@ export default class PlayScene extends Phaser.Scene {
       defaultKey: 'fire',
     });
 
+    this.playerMissileGroup = new PlayerMissile({
+      world: this.physics.world,
+      scene: this,
+      key: 'playerMissile',
+    })
+
 		this.showShipHealth();
 
     this.gameInit();
@@ -110,6 +117,7 @@ export default class PlayScene extends Phaser.Scene {
     this.events.on('ENEMY_STATION_SHIELDS_CHANGE', this.checkEnemyStationShields, this);
     this.events.on('SHOW_INFO', this.showInfo, this);
     this.events.on('FIRE', this.makeBullets, this);
+    this.events.on('FIRE_MISSILE', this.makePlayerMissile, this);
     EventsCenter.on('RESET', function () {
       this.model.emit('RESET');
       this.gameInit();
@@ -137,7 +145,7 @@ export default class PlayScene extends Phaser.Scene {
         removeFire: object.removeFire,
         updateAlert: object.updateAlert,
         explode: object.explode,
-        isDestroyed: object.isDestroyed,
+        vanish: object.vanish,
       } : undefined;
   }
 
@@ -148,7 +156,7 @@ export default class PlayScene extends Phaser.Scene {
 		Align.scaleToGameW(this.ship, CONFIG_SIZE.SHIP);
 		this.setShipConfigurations();
 		this.ship.body.collideWorldBounds = true;
-		this.grid.placeAt(565, this.ship);
+		this.grid.placeAt(CONFIG_SIZE.SHIP_POSITION, this.ship);
     this.ship.setVisible(true);
     if (tmpShip) {
       this.refillProperties(this.ship, tmpShip);
@@ -178,11 +186,17 @@ export default class PlayScene extends Phaser.Scene {
     if (tempEnemyStation) {
       this.refillProperties(this.enemyStation, tempEnemyStation);
     }
+    // this.enemyStation.isDestroyed = false;
 
     this.createEnemyFighter();
 		this.enemyFightersGroup.addListener('retracePosition', this.maintainPosition, this);
 
     this.missile = null;
+    this.playerMissile = null;
+    this.usedMissile = CONFIG_SIZE.NUM_MISSILES;
+    if (isMobile) {
+      this.missileButton.updateText(this.usedMissile);
+    }
     
 		this.cameras.main.setBounds(0, 0, this.background.displayWidth, this.background.displayHeight);
 
@@ -248,8 +262,10 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
   destroyEnemyStation() {
+    this.stationExplosionFire.setScale(1, 1);
     this.stationExplosionFire.setActive(false);
     this.stationExplosionFire.setVisible(false);
+    this.stationExplosionFire.setAlpha(1);
 		this.transition();
   }
 
@@ -316,9 +332,22 @@ export default class PlayScene extends Phaser.Scene {
 		this.cameras.main.fadeOut(2000, 0, 0, 0);
 	}
 
+  explosionStation() {
+    this.media.emit('PLAY_SOUND', 'explosionSound');
+    this.enemyStation.disableBody(true, true);
+    this.enemyFightersGroup.children.each(function(child) {
+      this.model.enemyShipShields = {
+        key: child.name,
+        shield: 0
+      };
+    }, this);
+  }
+
   checkEnemyStationShields() {
-    if (this.model.enemyStationShields < 50 && !this.enemyStation.hasLowHealth) {
-      this.createFire(this.enemyStation);
+    if (this.model.enemyStationShields < 50 && this.model.enemyStationShields > 0) {
+      if (!this.enemyStation.hasLowHealth) {
+        this.createFire(this.enemyStation);
+      }
     } else if (this.model.enemyStationShields === 0 && !this.enemyStation.isDestroyed) {
       // a massive explosion
       this.enemyStation.isDestroyed = true;
@@ -329,7 +358,7 @@ export default class PlayScene extends Phaser.Scene {
       this.stationExplosionFire.setActive(true);
       this.stationExplosionFire.setVisible(true);
       if (!('explode' in this.enemyStation)) {
-        const vanish = this.tweens.create({
+        this.enemyStation.vanish = this.tweens.create({
           targets: this.stationExplosionFire,
           alpha: 0,
           ease: 'Sine.easeInOut',
@@ -337,16 +366,7 @@ export default class PlayScene extends Phaser.Scene {
             this.destroyEnemyStation();
           },
           onCompleteScope: this,
-          onStart: function() {
-            this.media.emit('PLAY_SOUND', 'explosionSound');
-            this.enemyStation.disableBody(true, true);
-            this.enemyFightersGroup.children.each(function(child) {
-              this.model.enemyShipShields = {
-                key: child.name,
-                shield: 0
-              };
-            }, this);
-          },
+          onStart: this.explosionStation,
           onStartScope: this,
           callbackScope: this,
         });
@@ -358,14 +378,22 @@ export default class PlayScene extends Phaser.Scene {
           scaleY: CONFIG_SIZE.ENEMY_STATION_EXPLOSION_FIRE,
           ease: 'Quad.easeOut',
           onComplete: function() {
-            this.tweens.makeActive(vanish);
+            if (!this.enemyStation.vanishCached) {
+              this.tweens.makeActive(this.enemyStation.vanish);
+            } else {
+              this.enemyStation.vanish.restart();
+              this.explosionStation();
+            }
+            // this.enemyStation.vanish.restart();
           },
           onCompleteScope: this,
           callbackScope: this,
         });
         this.tweens.makeActive(this.enemyStation.explode);
       } else {
-        this.enemyStation.explode.restart();
+        this.enemyStation.vanishCached = true;
+        this.enemyStation.explode.restart();   
+        // this.tweens.makeActive(this.enemyStation.vanish)
       }
     }
   }
@@ -470,6 +498,22 @@ export default class PlayScene extends Phaser.Scene {
     }
   }
 
+  createMissileButton() {
+    this.missileButton = new ButtonWrapper({
+      scene: this,
+      key: 'missilebutton',
+      scaleFactor: CONFIG_SIZE.MISSILE_BUTTON_SCALE,
+      event: 'FIRE_MISSILE',
+      text: CONFIG_SIZE.NUM_MISSILES,
+      style: {
+        color: 'red',
+        fontFamily: 'Roboto'
+      },
+    });
+    this.missileButton.setScrollFactor(0);
+    this.grid.placeAt(CONFIG_SIZE.MISSILE_BUTTON, this.missileButton);
+  }
+
 	createFireButton() {
 		// fire button needs to be changed
 		this.fireButton = new ButtonWrapper({
@@ -477,6 +521,7 @@ export default class PlayScene extends Phaser.Scene {
       key: 'firebutton',
       scaleFactor: CONFIG_SIZE.FIRE_BUTTON_SIZE,
       event: 'FIRE',
+      longPress: true,
     });
 		this.fireButton.setScrollFactor(0);
 		this.grid.placeAt(CONFIG_SIZE.FIRE_BUTTON_POSITION, this.fireButton);
@@ -610,11 +655,12 @@ export default class PlayScene extends Phaser.Scene {
 	}
 
 	makeBullets() {
-    const elapsed = Math.abs(this.lastBullet - this.getTimer());
-		
-		if (elapsed < 500) {
-			return;
-		}
+    if (!isMobile) {
+      const elapsed = Math.abs(this.lastBullet - this.getTimer());
+      if (elapsed < 500) {
+        return;
+      }
+    }
 
 		this.lastBullet = this.getTimer();
     this.media.emit('PLAY_SOUND', 'gunshot');
@@ -721,14 +767,14 @@ export default class PlayScene extends Phaser.Scene {
 		}	
 	}
 
-	moveEnemy(fighter) {
-		const rad = Phaser.Math.Angle.Between(fighter.x, fighter.y, this.ship.x, this.ship.y);
+	moveEnemy(fighter, object) {
+		const rad = Phaser.Math.Angle.Between(fighter.x, fighter.y, object.x, object.y);
 		fighter.angle = Align.toDegrees(rad);
 		this.enemyFightersGroup.emit('retracePosition');
 		if (
-			Align.detectProximity(fighter, this.ship, fighter.flyRange) && !this.model.gameOver
+			Align.detectProximity(fighter, object, fighter.flyRange) && !this.model.gameOver
 		) {
-			this.physics.moveTo(fighter, this.ship.x, this.ship.y, fighter.topSpeed);
+			this.physics.moveTo(fighter, object.x, object.y, fighter.topSpeed);
 		} else {
 			this.retracePosition(fighter);
 		}
@@ -750,15 +796,87 @@ export default class PlayScene extends Phaser.Scene {
 		this.physics.moveTo(bullet, this.ship.x, this.ship.y, 300);
 	}
 
+  makePlayerMissile() {
+    if (!isMobile) {
+      const elapsed = Math.abs(this.lastMissile - this.getTimer());
+      if (elapsed < 500) {
+        return;
+      }
+    }
+
+		this.lastMissile = this.getTimer();
+    if (this.usedMissile <= 0) {
+      return;
+    }
+    this.playerMissile = this.playerMissileGroup.spawn({
+      x: this.ship.x,
+      y: this.ship.y,
+      angle: this.ship.angle,
+    });
+    this.createFire(this.playerMissile);
+    this.usedMissile -= 1;
+    this.media.emit('PLAY_SOUND', 'gunshot');
+    if (isMobile) {
+      this.missileButton.updateText(this.usedMissile);
+    }
+    // enemy station hit
+    this.physics.add.overlap(this.enemyStation, this.playerMissile, 
+      function (station, missile) {
+        this.model.enemyStationShields = 0;
+        this.media.emit('PLAY_SOUND', 'explosionSound');
+        missile.disableBody(true, true);
+        this.createExplosion(missile.x, missile.y);
+        this.playerMissile.removeFire();
+        this.playerMissile = null;
+      },
+      PlayScene.shouldProcessOverlap,
+      this
+    );
+    // enemy ships hit
+    this.physics.add.overlap(this.playerMissile, this.enemyFightersGroup, 
+      function (missile, fighter) {
+        this.model.enemyShipShields = {
+          key: fighter.name,
+          shield: 0,
+        };
+        this.media.emit('PLAY_SOUND', 'explosionSound');
+        missile.disableBody(true, true);
+        fighter.disableBody(true, true);
+        this.createExplosion(fighter.x, fighter.y);
+        this.playerMissile.removeFire();
+        this.playerMissile = null;
+      },
+      PlayScene.shouldProcessOverlap,
+      this
+    ); 
+    // rocks hit missile
+    this.physics.add.overlap(this.playerMissile, this.rockGroup, 
+      function (missile, rock) {
+        this.createExplosion(rock.x, rock.y);
+        this.media.emit('PLAY_SOUND', 'explosionSound');
+        missile.disableBody(true, true);
+        rock.disableBody(true, true);
+        this.playerMissile.removeFire();
+        this.playerMissile = null;
+      },
+      PlayScene.shouldProcessOverlap,
+      this
+    );
+  }
+
 	fallbackToKeyboard() {
 		const cursors = this.input.keyboard.createCursorKeys();
 		const keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    const keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
     const keySpace = this.input.keyboard.addKey('SPACE');
 		let stop = false;
 
 		if (keyS.isDown) {
 			this.makeBullets();
 		}
+    if (keyA.isDown) {
+      this.makePlayerMissile();
+    }
 
     if (keySpace.isDown) {      
       this.scene.launch('PauseScene', {
@@ -888,16 +1006,13 @@ export default class PlayScene extends Phaser.Scene {
 			this.fallbackToKeyboard();
 		}
 
-    // if (this.model.gameOver) {
-    //   return;
-    // }
-
 		let closestEnemyFighter;
+    let protectingFighter;
 
 		if (this.enemyFightersGroup.getLength() > 0 && this.enemyStation.active) {
 			closestEnemyFighter = FindClosest(this.enemyFightersGroup, this.ship);
 			this.pursuingFighter = closestEnemyFighter;
-			this.moveEnemy(closestEnemyFighter);
+			this.moveEnemy(closestEnemyFighter, this.ship);
 
 			if (Align.detectProximity(
 					this.ship, 
@@ -907,11 +1022,16 @@ export default class PlayScene extends Phaser.Scene {
 			) {
 				this.makeEnemyBullets(closestEnemyFighter);
 			}
+
+      if (this.playerMissile) {
+        protectingFighter = FindClosest(this.enemyFightersGroup, this.playerMissile);
+        this.moveEnemy(protectingFighter, this.playerMissile);
+      }
 		}
 
 		this.fireMissile();
 		this.recalibrateMissile();
-    // this.destroyChildren(this.bulletGroup);
-    // this.destroyChildren(this.enemyBulletGroup);
+    this.destroyChildren(this.bulletGroup);
+    this.destroyChildren(this.enemyBulletGroup);
 	}
 }
