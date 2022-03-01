@@ -65,8 +65,10 @@ export default class ButtonWrapper extends Phaser.GameObjects.Container {
 	}
 
 	pressed() {
-    this.scene.tweens.makeActive(this.pressGesture);
+    this.scene.events.emit(this.config.event);
     if (this.config.longPress) {
+      this.background.scaleX *= 0.8;
+      this.background.scaleY *= 0.8;
       this.repeatTimer = this.scene.time.addEvent({
         callback: function () {
           this.scene.events.emit(this.config.event);
@@ -76,13 +78,17 @@ export default class ButtonWrapper extends Phaser.GameObjects.Container {
         loop: true,
       })
     } else {
-  		this.scene.events.emit(this.config.event);
+      this.scene.tweens.makeActive(this.pressGesture);
     }
 	}
 
   unpressed() {
     this.scene.tweens.makeActive(this.unpressGesture);
     this.scene.time.removeEvent(this.repeatTimer);
+    if (this.config.longPress) {
+      this.background.scaleX *= 1.25;
+      this.background.scaleY *= 1.25;
+    }
   }
 
   updateText(text) {
